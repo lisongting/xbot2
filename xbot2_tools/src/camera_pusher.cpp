@@ -27,16 +27,16 @@ extern "C"{
 
 /**
     This program  is used for sending live camera video to RTMP-Server,
-    then the rtmp-stream can be decoded and played in any player which support RTMP protocol.
+    then the rtmp-stream can be decoded and played in any player which supports RTMP protocol.
     It works well on camera device such as ASUS Xtion pro and Kinect. 
-    Please make sure the RTMP-Server has started,
-    and the camera device is connected correctly before execute this program.
+    Please make sure the RTMP-Server hava started,
+    and the camera device is connected correctly before executing this program.
 
     run:
             rosrun xbot2_tools camera_pusher
 
     You can subscribe  "/camera/streamer_info" topic to receive notifications of its working 
-    state from another ros node.
+    state from another ROS node.
     rtmp address of RGB video --  rtmp://localhost/rgb
     rtmp address of Depth video -- rtmp://localhost/depth
     @author  lisongting(https://github.com/lisongting)
@@ -261,8 +261,7 @@ void startOpenni(){
     video_stream_color.setVideoMode( color_mode);
     //set depth and color image registration mode
     if( any_device.isImageRegistrationModeSupported(
-        openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR ) )
-    {
+        openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR ) ){
         any_device.setImageRegistrationMode( openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR );
     }
         
@@ -272,8 +271,8 @@ void startOpenni(){
     Status colorStatus = video_stream_color.start();
     checkOpenNIError(colorStatus,"start color stream ");
     // create  OpenCV image window 
-    namedWindow( "Depth Image",  CV_WINDOW_AUTOSIZE );
-    namedWindow( "Color Image",  CV_WINDOW_AUTOSIZE );
+    // namedWindow( "Depth Image",  CV_WINDOW_AUTOSIZE );
+    // namedWindow( "Color Image",  CV_WINDOW_AUTOSIZE );
     
     openni::VideoFrameRef  frame_depth;
     openni::VideoFrameRef  frame_color;
@@ -287,31 +286,31 @@ void startOpenni(){
     while( 1){
         if(video_stream_color.isValid()){
             if(video_stream_color.readFrame( &frame_color )==STATUS_OK){    
-                    //transform VideoFrameRef to cv::Mat
-                    const cv::Mat mImageRGB(frame_color.getHeight(), frame_color.getWidth(), CV_8UC3, (void*)frame_color.getData());
-                    //make RGB pixel format to BGR pixel format
-                    cv::Mat imageBGRSrc , imageBGRDest;
-                    cv::cvtColor( mImageRGB, imageBGRSrc, CV_RGB2BGR );
-                    imageBGRDest .create(imageBGRSrc.size(),imageBGRSrc.type());
+                //transform VideoFrameRef to cv::Mat
+                const cv::Mat mImageRGB(frame_color.getHeight(), frame_color.getWidth(), CV_8UC3, (void*)frame_color.getData());
+                //make RGB pixel format to BGR pixel format
+                cv::Mat imageBGRSrc , imageBGRDest;
+                cv::cvtColor( mImageRGB, imageBGRSrc, CV_RGB2BGR );
+                imageBGRDest .create(imageBGRSrc.size(),imageBGRSrc.type());
 
-                    //get the mirror image of source image 
-                    Mat map_x;
-                    Mat map_y;
-                    map_x.create(imageBGRSrc.size(),CV_32FC1);
-                    map_y.create(imageBGRSrc.size(),CV_32FC1);
-                    for(int i=0;i<imageBGRSrc.rows;i++){
-                        for(int j=0;j<imageBGRSrc.cols;j++){
-                            map_x.at<float>(i,j) =(float) (imageBGRSrc.cols-j);
-                            map_y.at<float>(i,j) = (float) i;
-                        }
+                //get the mirror image of source image 
+                Mat map_x;
+                Mat map_y;
+                map_x.create(imageBGRSrc.size(),CV_32FC1);
+                map_y.create(imageBGRSrc.size(),CV_32FC1);
+                for(int i=0;i<imageBGRSrc.rows;i++){
+                    for(int j=0;j<imageBGRSrc.cols;j++){
+                        map_x.at<float>(i,j) =(float) (imageBGRSrc.cols-j);
+                        map_y.at<float>(i,j) = (float) i;
                     }
-                    remap(imageBGRSrc,imageBGRDest,map_x,map_y,CV_INTER_LINEAR);
+                }
+                remap(imageBGRSrc,imageBGRDest,map_x,map_y,CV_INTER_LINEAR);
 
-                    //show Image 
-                    cv::imshow( "Color Image", imageBGRDest );
-                    waitKey(1);
-                    //send image to rtmp server 
-                    send_mat_to_server(&imageBGRDest,true);
+                //show Image 
+                //cv::imshow( "Color Image", imageBGRDest );
+                //waitKey(1);
+                //send image to rtmp server 
+                send_mat_to_server(&imageBGRDest,true);
             }else{
                 cout<<"read color stream error"<<endl;
             }
@@ -322,19 +321,19 @@ void startOpenni(){
             readFrameStatus = video_stream_depth.readFrame( &frame_depth );
             checkOpenNIError(readFrameStatus,"read depth frame");
             if(readFrameStatus ==STATUS_OK){
-                    const cv::Mat mImageDepth( frame_depth.getHeight(), frame_depth.getWidth(), CV_16UC1, (void*)frame_depth.getData());
-                    // change pixel format to CV_8U 
-                    cv::Mat mScaledDepth;
-                    // get max depth value 
-                    int iMaxDepth = video_stream_depth.getMaxPixelValue();
-                    mImageDepth.convertTo( mScaledDepth, CV_8U, 255.0 / iMaxDepth );
-                    flip(mScaledDepth,mScaledDepth,1);
+                const cv::Mat mImageDepth( frame_depth.getHeight(), frame_depth.getWidth(), CV_16UC1, (void*)frame_depth.getData());
+                // change pixel format to CV_8U 
+                cv::Mat mScaledDepth;
+                // get max depth value 
+                int iMaxDepth = video_stream_depth.getMaxPixelValue();
+                mImageDepth.convertTo( mScaledDepth, CV_8U, 255.0 / iMaxDepth );
+                flip(mScaledDepth,mScaledDepth,1);
                   
-                    cv::Mat imageDepthSrc ;
-                    cv::cvtColor( mScaledDepth, imageDepthSrc, CV_GRAY2BGR );
-                    cv::imshow( "Depth Image", imageDepthSrc );
-                    cv::waitKey(1);
-                    send_mat_to_server(&imageDepthSrc,false);
+                cv::Mat imageDepthSrc ;
+                cv::cvtColor( mScaledDepth, imageDepthSrc, CV_GRAY2BGR );
+                //cv::imshow( "Depth Image", imageDepthSrc );
+                //cv::waitKey(1);
+                send_mat_to_server(&imageDepthSrc,false);
             }else{
                 cout<<"read depth stream error"<<endl;
             }
@@ -442,7 +441,7 @@ void send_mat_to_server(cv::Mat * mat,bool is_rgb){
             checkFFmpegError("write RGB frame to output URL ",t1);
             frame_count_rgb++;
         }else{
-             AVRational time_base = out_stream_depth->time_base;  //
+            AVRational time_base = out_stream_depth->time_base;  //
             AVRational framerate = codec_ctx_depth->framerate; //FPS   
             AVRational time_base_q = {1,AV_TIME_BASE};  //AV_TIME_BASE   1000000
 
