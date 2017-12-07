@@ -109,6 +109,8 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
+add_subdirectory(src)
+
 ###########
 ## Build ##
 ###########
