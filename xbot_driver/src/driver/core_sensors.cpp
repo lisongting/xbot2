@@ -72,28 +72,29 @@ bool CoreSensors::deserialise(ecl::PushAndPop<unsigned char> & byteStream)
   buildVariable(infred_num, byteStream);
 //clockwise direction, the left or right is based on the robot face
   buildVariable(tempvariable,byteStream);
-  data.rear_right_infred = tempvariable/10000.0;
+  std::cout<<"rear_right_infred: "<<tempvariable<<std::endl;
+  data.rear_right_infred = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.rear_center_infred = tempvariable/10000.0;
+  data.rear_center_infred = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.rear_left_infred = tempvariable/10000.0;
+  data.rear_left_infred = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.front_left_infred = tempvariable/10000.0;
+  data.front_left_infred = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.front_center_infred = tempvariable/10000.0;
+  data.front_center_infred = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.front_right_infred = tempvariable/10000.0;
+  data.front_right_infred = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.dock_left_infred = tempvariable/10000.0;
+  data.dock_left_infred = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.dock_right_infred = tempvariable/10000.0;
+  data.dock_right_infred = tempvariable;
 //  std::cout<<"rear_center_infred:"<<data.rear_center_infred<<std::endl;
 
   unsigned char current_num;//0x05
@@ -118,22 +119,22 @@ bool CoreSensors::deserialise(ecl::PushAndPop<unsigned char> & byteStream)
   buildVariable(echo_num,byteStream);
 //clockwise direction, the left or right is based on the robot face
   buildVariable(tempvariable,byteStream);
-  data.rear_right_echo = tempvariable/10000.0;
+  data.rear_right_echo = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.rear_center_echo = tempvariable/10000.0;
+  data.rear_center_echo = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.rear_left_echo = tempvariable/10000.0;
+  data.rear_left_echo = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.front_left_echo = tempvariable/10000.0;
+  data.front_left_echo = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.front_center_echo = tempvariable/10000.0;
+  data.front_center_echo = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.front_right_echo = tempvariable/10000.0;
+  data.front_right_echo = tempvariable;
 
 //  std::cout<<"front_center_echo:"<<data.front_center_echo<<std::endl;
   unsigned char encoder_num;

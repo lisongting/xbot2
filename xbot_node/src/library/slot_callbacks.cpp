@@ -194,7 +194,7 @@ void XbotRos::publishDebugSensors()
 
 void XbotRos::publishRobotState()
 {
-    ros::Rate r(10);
+    ros::Rate r(50);
     if ( ros::ok() && (robot_state_publisher.getNumSubscribers() > 0) )
     {
         xbot_msgs::XbotStatePtr msg(new xbot_msgs::XbotState);
@@ -204,6 +204,22 @@ void XbotRos::publishRobotState()
         msg->height_percent = xbot.getHeightPercent();
         msg->cloud_degree = xbot.getPlatformDegree();
         msg->camera_degree = xbot.getCameraDegree();
+        msg->dock_left_infred = data.dock_left_infred;
+        msg->dock_right_infred = data.dock_right_infred;
+        msg->front_left_hanged = ((data.front_left_infred-2400)>0)&&((data.front_left_infred-2700)<0);
+        msg->front_center_hanged = ((data.front_center_infred-2400)>0)&&((data.front_center_infred-2700)<0);
+        msg->front_right_hanged = ((data.front_right_infred-2400)>0)&&((data.front_right_infred-2700)<0);
+        msg->rear_left_hanged = ((data.rear_left_infred-2400)>0)&&((data.rear_left_infred-2700)<0);
+        msg->rear_center_hanged = ((data.rear_center_infred-2400)>0)&&((data.rear_center_infred-2700)<0);
+        msg->rear_right_hanged = ((data.rear_right_infred-2400)>0)&&((data.rear_right_infred-2700)<0);
+        msg->is_hanged = msg->front_left_hanged&&msg->front_center_hanged&&msg->front_right_hanged&&msg->rear_left_hanged&&msg->rear_center_hanged&&msg->rear_right_hanged;
+        msg->front_left_echo = data.front_left_echo;
+        msg->front_center_echo = data.front_center_echo;
+        msg->front_right_echo = data.front_right_echo;
+        msg->rear_left_echo = data.rear_left_echo;
+        msg->rear_center_echo = data.rear_center_echo;
+        msg->rear_right_echo = data.rear_right_echo;
+
         robot_state_publisher.publish(msg);
         r.sleep();
 

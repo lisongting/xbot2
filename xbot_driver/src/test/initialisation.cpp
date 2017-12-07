@@ -38,6 +38,6 @@ private:
 
 int main() {
   XbotManager xbot_manager;
-  ecl::Sleep()(5);
+  ecl::Sleep()(500);
   return 0;
 }
