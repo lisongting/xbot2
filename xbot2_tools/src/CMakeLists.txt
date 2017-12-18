@@ -6,6 +6,8 @@ file(GLOB SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
 
 find_package(OpenCV   REQUIRED)
 
+include_directories(include ${catkin_INCLUDE_DIRS})
+
 link_directories(/usr/local/lib)
 add_executable(camera_pusher ${SOURCES})
 add_dependencies(camera_pusher kobuki_msgs_gencpp)
