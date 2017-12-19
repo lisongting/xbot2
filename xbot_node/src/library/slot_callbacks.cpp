@@ -71,9 +71,9 @@ void XbotRos::publishSensorState()
     if (sensor_state_publisher.getNumSubscribers() > 0) {
       xbot_msgs::SensorState state;
       CoreSensors::Data data = xbot.getCoreSensorData();
-      state.time_stamp = data.timestamp;
+      state.header.stamp = ros::Time::now();
       state.battery_voltage = data.battery_voltage;
-      state.front_left_encoder = data.front_left_encoder;
+      state.front_left_encoder = data.timestamp;
       state.front_right_encoder = data.front_right_encoder;
       state.rear_left_encoder = data.rear_left_encoder;
       state.rear_right_encoder = data.rear_right_encoder;
@@ -174,7 +174,7 @@ void XbotRos::publishRawInertia()
 
 void XbotRos::publishDebugSensors()
 {
-//    ros::Rate r(50);
+    ros::Rate r(50);
     if ( ros::ok() && (debug_sensors_publisher.getNumSubscribers() > 0) )
     {
         xbot_msgs::DebugSensorPtr msg(new xbot_msgs::DebugSensor);
@@ -186,7 +186,7 @@ void XbotRos::publishDebugSensors()
         msg->data.push_back(data_debug.front_right_encoder);
         msg->heading=xbot.getHeading();
         debug_sensors_publisher.publish(msg);
-//        r.sleep();
+        r.sleep();
 
     }
 

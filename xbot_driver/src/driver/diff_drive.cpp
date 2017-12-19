@@ -61,6 +61,7 @@ void DiffDrive::update(const unsigned int &time_stamp,
   float right_diff_ticks = 0.0f;
   unsigned short curr_tick_left = 0;
   unsigned short curr_tick_right = 0;
+//  unsigned short tmp_diff_time = 0;
   unsigned int curr_timestamp = 0;
   curr_timestamp = time_stamp;
   curr_tick_left = left_encoder;
@@ -89,7 +90,9 @@ void DiffDrive::update(const unsigned int &time_stamp,
 
   if (curr_timestamp != last_timestamp)
   {
-    last_diff_time =((double)(short)((curr_timestamp - last_timestamp) & 0xffff)) / 1000000.0f;
+
+    last_diff_time =((double)(short)((curr_timestamp - last_timestamp) & 0xffff )) / 1000000.0f;
+    std::cout<<"diff_time: "<<last_diff_time<<std::endl;
     last_timestamp = curr_timestamp;
     last_velocity_left = (tick_to_rad * left_diff_ticks) / last_diff_time;
     last_velocity_right = (tick_to_rad * right_diff_ticks) / last_diff_time;

@@ -205,7 +205,7 @@ void Xbot::spin()
     /*********************
      ** Read Incoming
      **********************/
-    int n = serial.read((char*)buf, packet_finder.numberOfDataToRead());
+    int n = serial.read((char*)buf, 1/*packet_finder.numberOfDataToRead()*/);
 
     if (n == 0)
     {
@@ -251,7 +251,8 @@ void Xbot::spin()
 //        std::cout << "local_buffer: " << local_buffer.size() << " | ";
 //        std::cout << std::endl;
           if( !core_sensors.deserialise(data_buffer) )
-              { fixPayload(data_buffer); break; }
+              { std::cout<<"fixed"<<std::endl;
+            fixPayload(data_buffer); break; }
           sig_stream_data.emit();
 
       }

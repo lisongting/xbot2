@@ -164,7 +164,7 @@ bool CoreSensors::deserialise(ecl::PushAndPop<unsigned char> & byteStream)
   buildVariable(data.roll, byteStream);
   buildVariable(data.timestamp, byteStream);
 
-//  std::cout<<"timestamp:"<<data.timestamp<<std::endl;
+  std::cout<<"timestamp:"<<data.timestamp<<std::endl;
 //  unsigned short x=3;
 //  unsigned short y=65500;
 //  unsigned short result=x-y;
