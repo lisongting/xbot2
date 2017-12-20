@@ -205,7 +205,8 @@ void Xbot::spin()
     /*********************
      ** Read Incoming
      **********************/
-    int n = serial.read((char*)buf, 1/*packet_finder.numberOfDataToRead()*/);
+    int n = serial.read((char*)buf, 1);
+//    std::cout<<"n: "<<n<<std::endl;
 
     if (n == 0)
     {

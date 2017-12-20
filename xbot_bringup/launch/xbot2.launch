@@ -1,6 +1,6 @@
 <launch>
 	<!-- Xbot -->
-	<arg name="simulation"        default="false"   doc="set flags to indicate this turtle is run in simulation mode."/>
+	<arg name="simulation"        default="false"   doc="set flags to indicate this xbot is run in simulation mode."/>
 	<arg name="serialport"        default="/dev/xbot"  doc="used by create to configure the port it is connected on [/dev/ttyUSB0, /dev/ttyS0]"/>
 
 	<param name="/use_sim_time" value="$(arg simulation)"/>
@@ -8,9 +8,7 @@
 
 
 	<!-- Load the URDF/Xacro model of our robot -->
-
-
-	<arg name="urdf_file" default="$(find xacro)/xacro.py '$(find xbot_bringup)/urdf/Xbot.urdf.xacro'" />
+	<arg name="urdf_file" default="$(find xacro)/xacro.py '$(find xbot2_description)/urdf/robot.xacro'" />
 	<param name="robot_description" command="$(arg urdf_file)" />
 
 	<!-- state publisher -->
@@ -24,17 +22,10 @@
 	<param name="sim" value="true"/>
 	</include>
 
+	<!-- rosbridge_server -->
+	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 
-
-	<!--sensor asus depth camera-->
-	<include file="$(find xbot_bringup)/launch/includes/sensor.launch">
-	<arg name="rgb_processing" default="false" />
-	<arg name="depth_registration" default="false" />
-	<arg name="depth_processing" default="false" />
-	<arg name="scan_topic" default="/asus_scan" />
-	<arg name = "3d_sensor" value = "asus_xtion_pro"/>
-	</include>
-
-
+	<!-- camera pusher -->
+	<node name="camera_pusher" pkg="xbot2_tools" type="camera_pusher" />
 
 </launch>

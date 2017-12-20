@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(xbot_keyop)
-find_package(catkin REQUIRED COMPONENTS geometry_msgs std_srvs std_msgs roscpp ecl_exceptions ecl_threads ecl_time xbot_msgs)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs std_srvs std_msgs roscpp ecl_exceptions ecl_threads ecl_time xbot2_msgs)
 
 catkin_package(
    INCLUDE_DIRS include
