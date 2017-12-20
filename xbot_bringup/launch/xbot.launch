@@ -22,10 +22,6 @@
 	<param name="sim" value="true"/>
 	</include>
 
-	<!-- rosbridge_server -->
-	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 
-	<!-- camera pusher -->
-	<node name="camera_pusher" pkg="xbot2_tools" type="camera_pusher" />
 
 </launch>
