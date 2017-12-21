@@ -341,7 +341,7 @@ void Xbot::resetXbotState()
 {
     setLiftControl(0);
     setPowerControl(1);
-    setCloudCameraControl(90,90);
+    setCloudCameraControl(0,0);
 }
 
 /*****************************************************************************
