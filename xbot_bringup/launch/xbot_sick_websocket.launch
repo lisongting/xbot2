@@ -22,6 +22,9 @@
 	<param name="sim" value="true"/>
 	</include>
 
+	<!-- rplidar -->
+	<include file="$(find xbot_bringup)/launch/sick.launch" />
+
 	<!-- rosbridge_server -->
 	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 
