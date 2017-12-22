@@ -73,7 +73,7 @@ void XbotRos::publishSensorState()
       CoreSensors::Data data = xbot.getCoreSensorData();
       state.header.stamp = ros::Time::now();
       state.battery_voltage = data.battery_voltage;
-      state.front_left_encoder = data.timestamp;
+      state.front_left_encoder = data.front_left_encoder;
       state.front_right_encoder = data.front_right_encoder;
       state.rear_left_encoder = data.rear_left_encoder;
       state.rear_right_encoder = data.rear_right_encoder;

@@ -96,7 +96,7 @@ void Odometry::update(const ecl::Pose2D<double> &pose_update, ecl::linear_algebr
 //  }
 
   //since all ros tf odometry is 6DOF we'll need a quaternion created from yaw
-  geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(-pose.heading());
+  geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(pose.heading());
 
   if ( ros::ok() ) {
     publishTransform(odom_quat);
@@ -133,15 +133,15 @@ void Odometry::publishOdometry(const geometry_msgs::Quaternion &odom_quat,
   odom->child_frame_id = base_frame;
 
   // Position
-  odom->pose.pose.position.x = -pose.x();
-  odom->pose.pose.position.y = -pose.y();
+  odom->pose.pose.position.x = pose.x();
+  odom->pose.pose.position.y = pose.y();
   odom->pose.pose.position.z = 0.0;
   odom->pose.pose.orientation = odom_quat;
 
   // Velocity
-  odom->twist.twist.linear.x = -pose_update_rates[0];
+  odom->twist.twist.linear.x = pose_update_rates[0];
   odom->twist.twist.linear.y = pose_update_rates[1];
-  odom->twist.twist.angular.z = -pose_update_rates[2];
+  odom->twist.twist.angular.z = pose_update_rates[2];
 
   // Pose covariance (required by robot_pose_ekf) TODO: publish realistic values
   // Odometry yaw covariance must be much bigger than the covariance provided
