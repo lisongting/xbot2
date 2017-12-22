@@ -96,7 +96,7 @@ void Odometry::update(const ecl::Pose2D<double> &pose_update, ecl::linear_algebr
 //  }
 
   //since all ros tf odometry is 6DOF we'll need a quaternion created from yaw
-  geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(pose.heading());
+  geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(-pose.heading());
 
   if ( ros::ok() ) {
     publishTransform(odom_quat);
@@ -133,8 +133,8 @@ void Odometry::publishOdometry(const geometry_msgs::Quaternion &odom_quat,
   odom->child_frame_id = base_frame;
 
   // Position
-  odom->pose.pose.position.x = pose.x();
-  odom->pose.pose.position.y = pose.y();
+  odom->pose.pose.position.x = -pose.x();
+  odom->pose.pose.position.y = -pose.y();
   odom->pose.pose.position.z = 0.0;
   odom->pose.pose.orientation = odom_quat;
 
