@@ -51,6 +51,7 @@ void XbotRos::processStreamData() {
   publishSensorState();
   publishDockIRData();
   publishEchoData();
+  publishInfraredData();
   publishInertia();
   publishRawInertia();
   publishDebugSensors();
