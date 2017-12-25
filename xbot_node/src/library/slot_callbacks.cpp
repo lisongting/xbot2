@@ -292,6 +292,9 @@ void XbotRos::publishInfraredData()
       msg.rear_left = data_core.rear_left_infred;
       msg.rear_center = data_core.rear_center_infred;
       msg.rear_right = data_core.rear_right_infred;
+
+
+      infrared_data_publisher.publish(msg);
     }
   }
 }
