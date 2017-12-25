@@ -59,12 +59,14 @@
 #include <xbot_msgs/SensorState.h>
 #include <xbot_msgs/DebugSensor.h>
 #include <xbot_msgs/Echos.h>
+#include <xbot_msgs/InfraRed.h>
 #include <xbot_driver/xbot.hpp>
 #include <xbot_msgs/CloudCamera.h>
 #include <xbot_msgs/Lift.h>
 #include <xbot_msgs/XbotState.h>
 #include <xbot_msgs/ImuNine.h>
 #include <xbot_msgs/Power.h>
+#include <xbot_msgs/ImuNine.h>
 #include "odometry.hpp"
 
 /*****************************************************************************
@@ -101,6 +103,7 @@ private:
   ros::Publisher sensor_state_publisher;
   ros::Publisher joint_state_publisher;
   ros::Publisher dock_ir_publisher;
+  ros::Publisher infrared_data_publisher;
   ros::Publisher echo_data_publisher;
   ros::Publisher raw_control_command_publisher;
 
@@ -141,6 +144,7 @@ private:
   void publishSensorState();
   void publishDockIRData();
   void publishEchoData();
+  void publishInfraredData();
   void publishDebugSensors();
   void publishRobotState();
 

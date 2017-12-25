@@ -213,12 +213,12 @@ void XbotRos::publishRobotState()
         msg->rear_center_hanged = ((data.rear_center_infred-2400)>0)&&((data.rear_center_infred-2700)<0);
         msg->rear_right_hanged = ((data.rear_right_infred-2400)>0)&&((data.rear_right_infred-2700)<0);
         msg->is_hanged = msg->front_left_hanged&&msg->front_center_hanged&&msg->front_right_hanged&&msg->rear_left_hanged&&msg->rear_center_hanged&&msg->rear_right_hanged;
-        msg->front_left_echo = data.front_left_echo;
-        msg->front_center_echo = data.front_center_echo;
-        msg->front_right_echo = data.front_right_echo;
-        msg->rear_left_echo = data.rear_left_echo;
-        msg->rear_center_echo = data.rear_center_echo;
-        msg->rear_right_echo = data.rear_right_echo;
+        msg->front_left_near = data.front_left_echo;
+        msg->front_center_near = data.front_center_echo;
+        msg->front_right_near = data.front_right_echo;
+        msg->rear_left_near = data.rear_left_echo;
+        msg->rear_center_near = data.rear_center_echo;
+        msg->rear_right_near = data.rear_right_echo;
 
         robot_state_publisher.publish(msg);
         r.sleep();
@@ -253,14 +253,21 @@ void XbotRos::publishEchoData()
   {
     if(echo_data_publisher.getNumSubscribers()>0)
     {
-      xbot_msgs::EchosPtr msg(new xbot_msgs::Echos());
+      xbot_msgs::Echos msg;
       CoreSensors::Data data_echo = xbot.getCoreSensorData();
-      msg->header.frame_id = "echo_link";
-      msg->header.stamp = ros::Time::now();
-      int near_left = (data_echo.front_left_echo<=0.07)?1:0;
-      int near_center = (data_echo.front_center_echo<=0.2)?2:0;
-      int near_right = (data_echo.front_right_echo<=0.07)?4:0;
-      msg->near = near_left+near_center+near_right;
+      msg.header.frame_id = "echo_link";
+      msg.header.stamp = ros::Time::now();
+      msg.front_left = data_echo.front_left_echo;
+      msg.front_center = data_echo.front_center_echo;
+      msg.front_right = data_echo.front_right_echo;
+      msg.rear_left = data_echo.rear_left_echo;
+      msg.rear_center = data_echo.rear_center_echo;
+      msg.rear_right = data_echo.rear_right_echo;
+
+//      int near_left = (data_echo.front_left_echo<=0.07)?1:0;
+//      int near_center = (data_echo.front_center_echo<=0.2)?2:0;
+//      int near_right = (data_echo.front_right_echo<=0.07)?4:0;
+//      msg->near = near_left+near_center+near_right;
       echo_data_publisher.publish(msg);
 
     }
@@ -268,6 +275,25 @@ void XbotRos::publishEchoData()
 
 
 
+}
+void XbotRos::publishInfraredData()
+{
+  if(ros::ok())
+  {
+    if(infrared_data_publisher.getNumSubscribers()>0)
+    {
+      xbot_msgs::InfraRed msg;
+      CoreSensors::Data data_core = xbot.getCoreSensorData();
+      msg.header.frame_id = "infrared_link";
+      msg.header.stamp = ros::Time::now();
+      msg.front_left = data_core.front_left_infred;
+      msg.front_center = data_core.front_center_infred;
+      msg.front_right = data_core.front_right_infred;
+      msg.rear_left = data_core.rear_left_infred;
+      msg.rear_center = data_core.rear_center_infred;
+      msg.rear_right = data_core.rear_right_infred;
+    }
+  }
 }
 
 } // namespace xbot

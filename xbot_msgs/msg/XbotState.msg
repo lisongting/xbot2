@@ -27,16 +27,16 @@ bool front_right_hanged
 bool rear_left_hanged
 bool rear_center_hanged
 bool rear_right_hanged
-float64 dock_left_infred
-float64 dock_right_infred
+uint16 dock_left_infred
+uint16 dock_right_infred
 
 # echo
 float64 ECHO_MAX_RANGE = 1.0
 float64 ECHO_MIN_RANGE = 0.3
 bool is_obstacle
-float64 front_left_echo
-float64 front_center_echo
-float64 front_right_echo
-float64 rear_left_echo
-float64 rear_center_echo
-float64 rear_right_echo
+bool front_left_near
+bool front_center_near
+bool front_right_near
+bool rear_left_near
+bool rear_center_near
+bool rear_right_near

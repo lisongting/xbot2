@@ -275,6 +275,7 @@ void XbotRos::advertiseTopics(ros::NodeHandle& nh)
   sensor_state_publisher = nh.advertise < xbot_msgs::SensorState > ("sensors/core", 100);
   dock_ir_publisher = nh.advertise < xbot_msgs::DockInfraRed > ("sensors/dock_ir", 100);
   echo_data_publisher = nh.advertise < xbot_msgs::Echos > ("sensors/echo", 100);
+  infrared_data_publisher = nh.advertise < xbot_msgs::InfraRed >("sensors/infrared", 100);
   imu_data_publisher = nh.advertise < sensor_msgs::Imu > ("sensors/imu_data", 100);
   raw_imu_data_publisher = nh.advertise < xbot_msgs::ImuNine > ("sensors/imu_data_raw", 100);
   raw_control_command_publisher = nh.advertise< std_msgs::Int16MultiArray > ("debug/raw_control_command", 100);

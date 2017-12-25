@@ -15,6 +15,7 @@ add_message_files(DIRECTORY msg
                       ImuNine.msg
                       ImuYRP.msg
                       Echos.msg
+                      InfraRed.msg
                       NaviState.msg
                  )
 
