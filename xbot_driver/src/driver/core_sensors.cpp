@@ -72,31 +72,36 @@ bool CoreSensors::deserialise(ecl::PushAndPop<unsigned char> & byteStream)
   buildVariable(infred_num, byteStream);
 //clockwise direction, the left or right is based on the robot face
   buildVariable(tempvariable,byteStream);
-  std::cout<<"rear_right_infred: "<<tempvariable<<std::endl;
-  data.rear_right_infred = tempvariable;
+  queue_rear_left_infrared.lpush(tempvariable);
+  data.rear_left_infred = queue_rear_left_infrared.mean();
 
   buildVariable(tempvariable,byteStream);
-  data.rear_center_infred = tempvariable;
+  queue_rear_center_infrared.lpush(tempvariable);
+  data.rear_center_infred = queue_rear_center_infrared.mean();
 
   buildVariable(tempvariable,byteStream);
-  data.rear_left_infred = tempvariable;
+  queue_rear_right_infrared.lpush(tempvariable);
+  data.rear_right_infred = queue_rear_right_infrared.mean();
 
   buildVariable(tempvariable,byteStream);
-
   queue_front_left_infrared.lpush(tempvariable);
   data.front_left_infred = queue_front_left_infrared.mean();
 
   buildVariable(tempvariable,byteStream);
-  data.front_center_infred = tempvariable;
+  queue_front_center_infrared.lpush(tempvariable);
+  data.front_center_infred = queue_front_center_infrared.mean();
 
   buildVariable(tempvariable,byteStream);
-  data.front_right_infred = tempvariable;
+  queue_front_right_infrared.lpush(tempvariable);
+  data.front_right_infred = queue_front_right_infrared.mean();
 
   buildVariable(tempvariable,byteStream);
-  data.dock_left_infred = tempvariable;
+  queue_dock_left_infrared.lpush(tempvariable);
+  data.dock_left_infred = queue_dock_left_infrared.mean();
 
   buildVariable(tempvariable,byteStream);
-  data.dock_right_infred = tempvariable;
+  queue_dock_left_infrared.lpush(tempvariable);
+  data.dock_left_infred = queue_dock_left_infrared.mean();
 //  std::cout<<"rear_center_infred:"<<data.rear_center_infred<<std::endl;
 
   unsigned char current_num;//0x05
