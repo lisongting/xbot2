@@ -94,14 +94,14 @@ public:
      short roll;
      unsigned short timestamp;
   } data;
-  lqueue <uint16_t> queue_front_left_infrared;
-  lqueue <uint16_t> queue_front_center_infrared;
-  lqueue <uint16_t> queue_front_right_infrared;
-  lqueue <uint16_t> queue_rear_left_infrared;
-  lqueue <uint16_t> queue_rear_center_infrared;
-  lqueue <uint16_t> queue_rear_right_infrared;
-  lqueue <uint16_t> queue_dock_left_infrared;
-  lqueue <uint16_t> queue_dock_right_infrared;
+  lqueue <uint> queue_front_left_infrared;
+  lqueue <uint> queue_front_center_infrared;
+  lqueue <uint> queue_front_right_infrared;
+  lqueue <uint> queue_rear_left_infrared;
+  lqueue <uint> queue_rear_center_infrared;
+  lqueue <uint> queue_rear_right_infrared;
+  lqueue <uint> queue_dock_left_infrared;
+  lqueue <uint> queue_dock_right_infrared;
   struct Flags {
       // Charging source
       // - first four bits distinguish between adapter or docking base charging
