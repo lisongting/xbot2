@@ -82,7 +82,9 @@ bool CoreSensors::deserialise(ecl::PushAndPop<unsigned char> & byteStream)
   data.rear_left_infred = tempvariable;
 
   buildVariable(tempvariable,byteStream);
-  data.front_left_infred = tempvariable;
+
+  queue_front_left_infrared.lpush(tempvariable);
+  data.front_left_infred = queue_front_left_infrared.mean();
 
   buildVariable(tempvariable,byteStream);
   data.front_center_infred = tempvariable;

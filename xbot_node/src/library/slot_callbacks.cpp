@@ -195,7 +195,7 @@ void XbotRos::publishDebugSensors()
 
 void XbotRos::publishRobotState()
 {
-    ros::Rate r(50);
+//    ros::Rate r(50);
     if ( ros::ok() && (robot_state_publisher.getNumSubscribers() > 0) )
     {
         xbot_msgs::XbotStatePtr msg(new xbot_msgs::XbotState);
@@ -222,7 +222,7 @@ void XbotRos::publishRobotState()
         msg->rear_right_near = data.rear_right_echo;
 
         robot_state_publisher.publish(msg);
-        r.sleep();
+//        r.sleep();
 
     }
 

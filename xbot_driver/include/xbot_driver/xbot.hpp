@@ -31,6 +31,7 @@
 #include "packet_handler/packet_finder.hpp"
 #include "macros.hpp"
 
+
 /*****************************************************************************
 ** Extern Templates
 *****************************************************************************/
@@ -168,6 +169,7 @@ private:
   unsigned char CameraDegree;
   bool Power;
 
+
   /*********************
   ** Odometry
   **********************/
@@ -194,6 +196,7 @@ private:
   ** Packet Handling
   **********************/
   CoreSensors core_sensors;
+
   ImuSensors imu_sensors;
   ecl::Serial serial;
   PacketFinder packet_finder;

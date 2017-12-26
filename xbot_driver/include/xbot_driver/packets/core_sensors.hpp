@@ -19,6 +19,7 @@
 
 #include "../packet_handler/payload_base.hpp"
 #include "../macros.hpp"
+#include "../lqueue.h"
 #include <stdint.h>
 
 /*****************************************************************************
@@ -35,7 +36,7 @@ namespace xbot
 class xbot_PUBLIC CoreSensors : public packet_handler::payloadBase
 {
 public:
-  CoreSensors() : packet_handler::payloadBase(false, 42) {};
+  CoreSensors() : packet_handler::payloadBase(false, 42),queue_front_left_infrared(10) {};
 
   struct Data {
      float battery_voltage;
@@ -68,6 +69,7 @@ public:
      uint16_t rear_right_encoder;
      uint16_t up_down_encoder;
 
+
      short acce_x;
      short acce_y;
      short acce_z;
@@ -83,6 +85,7 @@ public:
      short roll;
      unsigned short timestamp;
   } data;
+  lqueue <uint16_t> queue_front_left_infrared;// =new lqueue <uint16_t>(10);
 
   struct Flags {
       // Charging source
