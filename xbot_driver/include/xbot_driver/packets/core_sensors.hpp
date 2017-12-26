@@ -36,7 +36,7 @@ namespace xbot
 class xbot_PUBLIC CoreSensors : public packet_handler::payloadBase
 {
 public:
-  CoreSensors() : packet_handler::payloadBase(false, 42),queue_front_left_infrared(10) {};
+  CoreSensors() : packet_handler::payloadBase(false, 42),queue_front_left_infrared(25) {};
 
   struct Data {
      float battery_voltage;

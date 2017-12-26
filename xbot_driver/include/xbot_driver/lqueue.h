@@ -43,27 +43,21 @@ public:
 
     }
     T medium(){
-        T tmp;
-        T *tdata=data;
+        T tdata[MAX_L];
         for(int i=0;i<size;i++)
         {
             for(int j=i+1;j<size;j++)
             {
-                if(*(tdata+j)>tdata[i])
-                {
-                    tmp=*(tdata+i);
-                    *(tdata+i)=*(tdata+j);
-                    *(tdata+j)=tmp;
-                }
+                tdata[i]=(data[j]>data[i])?data[j]:data[i];
             }
         }
-        return *(tdata+(size-1)/2);
+        return tdata[(size-1)/2];
     }
     T mean(){
         T total=0;
         for(int i=0;i<size;i++)
         {
-            total+=*(data+i);
+            total+=data[i];
         }
         return total/size;
     }
