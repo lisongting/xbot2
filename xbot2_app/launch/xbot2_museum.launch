@@ -1,0 +1,38 @@
+<launch>
+	<!-- params configuration -->
+	<param name="/use_sim_time" value="false"/>
+
+
+	<!-- **************xbot base controller ************** -->
+	<include file="$(find xbot_bringup)/launch/xbot_sick571.launch">
+	</include>
+
+
+	<!-- ************** map_server to initial global static map ************** -->
+	<node name="map_server" pkg="map_server" type="map_server" args="-d $(find xbot2_app)/map/museum.yaml">
+		<rosparam name="frame_id"    value= "map" />
+	</node>
+
+	<!-- ************** amcl ************** -->
+	<include file="$(find xbot2_app)/launch/inculde/xbot2_amcl.launch.xml">
+		<arg name="initial_pose_x" value = "-0.636022786456"/>
+		<arg name="initial_pose_y" value = "8.70293702335"/>
+		<arg name="initial_pose_a" value = "-0.100474840346538993"/>
+	</include>
+
+
+
+	<!--  ************** Navigation  ***************  -->
+	<include file="$(find xbot_slam)/launch/include/move_base.launch.xml"/>
+
+	<!--  ************** rosbridge-server  ***************  -->
+	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+
+	<!--  **************** mapimg2base64 ****************  -->
+	<node name="mapimg2base64" pkg="xbot2_tools" type="mapimg2base64.py" />
+
+
+
+
+
+</launch>
