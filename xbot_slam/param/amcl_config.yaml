@@ -1,3 +1,5 @@
+scan_topic: scan
+use_map_topic: true
 initial_pose_x: 0.0
 initial_pose_y: 0.0
 initial_pose_a: 0
