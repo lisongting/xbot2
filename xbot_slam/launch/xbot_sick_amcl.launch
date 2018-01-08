@@ -1,10 +1,10 @@
 <launch>
 	<!-- params configuration -->
 	<param name="/use_sim_time" value="false"/>
-	<include file="$(find xbot_bringup)/launch/xbot.launch" />
-	<include file="$(find xbot_bringup)/launch/sick.launch" />
+	<!-- <include file="$(find xbot_bringup)/launch/xbot.launch" />
+	<include file="$(find xbot_bringup)/launch/sick.launch" /> -->
 
-	<arg name="map_file"       default="$(find xbot_slam)/map/museum.yaml" />
+	<arg name="map_file"       default="$(find xbot_slam)/map/museum_gmapping1.4.yaml" />
 	<node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)">
 		<param name="frame_id"          value="/map" />
 	</node>
@@ -12,10 +12,9 @@
 	<include file="$(find xbot_slam)/launch/include/amcl.launch.xml">
 	<arg name = "scan_topic"                    value="scan" />
 	<arg name = "use_map_topic"                 value="true" />
-	<arg name = "initial_pose_x"                    value="scan" />
-	<arg name = "initial_pose_y"                    value="scan" />
-	<arg name = "initial_pose_a"                    value="scan" />
-
+	<arg name = "initial_pose_x"                    value="4.0" />
+	<arg name = "initial_pose_y"                    value="-2.0" />
+	<arg name = "initial_pose_a"                    value="1.0" />
 	</include>
 
 
