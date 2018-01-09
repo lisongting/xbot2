@@ -496,7 +496,7 @@ Visualization Manager:
       Radius: 0.0299999993
       Shaft Diameter: 0.100000001
       Shaft Length: 0.100000001
-      Topic: /navi_goals/navi_plans
+      Topic: /navi_plans
       Unreliable: false
       Value: true
   Enabled: true
@@ -517,7 +517,7 @@ Visualization Manager:
       Single click: true
       Topic: /clicked_point
     - Class: rviz/SetGoal
-      Topic: /move_base_simple/goal
+      Topic: /goal
   Value: true
   Views:
     Current:

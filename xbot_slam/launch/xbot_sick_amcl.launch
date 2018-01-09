@@ -1,8 +1,8 @@
 <launch>
 	<!-- params configuration -->
 	<param name="/use_sim_time" value="false"/>
-	<!-- <include file="$(find xbot_bringup)/launch/xbot.launch" />
-	<include file="$(find xbot_bringup)/launch/sick.launch" /> -->
+	<include file="$(find xbot_bringup)/launch/xbot.launch" />
+	<include file="$(find xbot_bringup)/launch/sick.launch" />
 
 	<arg name="map_file"       default="$(find xbot_slam)/map/museum_gmapping1.4.yaml" />
 	<node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)">
