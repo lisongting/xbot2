@@ -3,7 +3,7 @@
 	<node name="sick_tim" pkg="sick_tim" type="sick_tim551_2050001" respawn="false" output="screen">
     <!-- default values: -->
     <!-- angle range: -90~90 -->
-    <param name="min_ang" type="double" value="-1.5708" >
+    <param name="min_ang" type="double" value="-1.5708" />
     <param name="max_ang" type="double" value="1.5708" />
   <!--<param name="intensity" type="bool" value="True" />
       <param name="skip" type="int" value="0" />

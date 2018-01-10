@@ -107,12 +107,12 @@ bool NaviGoalCore::init()
 	start_point.header.seq = 0;
 	std::string s = "map";
 	start_point.header.frame_id  = s;
-  start_point.pose.position.x = 4.0;
-  start_point.pose.position.y = -2.0;
+  start_point.pose.position.x = 5.0;
+  start_point.pose.position.y = 0.0;
 	start_point.pose.position.z = 0.0;
 	start_point.pose.orientation.x = 0.0;
 	start_point.pose.orientation.y = 0.0;
-	start_point.pose.orientation.z = 0.0;
+  start_point.pose.orientation.z = 0.0;
   start_point.pose.orientation.w = 1.0;
 
 	//first publish a initial event
@@ -237,54 +237,32 @@ void NaviGoalCore::processKeyboardInput(char c)
 //status:4    Fail to find a path
 void NaviGoalCore::naviGoalStatus(const move_base_msgs::MoveBaseActionResult& result)
 {
-	xbot_msgs::NaviState state;
-	state.subgoal_index = current_position;
-	reached_subgoal_publisher.publish(state);
-
-	//have finished a path
-	if(current_position==num_goals-1){
-		current_position = 0;
-		num_goals=0;
-		if(is_started){
-			ROS_INFO("Finished a path.....");
-			is_started = false;
-		}      
-		start_point = goals[0];
-		
-		 xbot_navigoals::RobotStatus robotStatus;
-		 robotStatus.id = current_position;
-		 robotStatus.ismoving = false;
-		 arrive_goal_publisher.publish(robotStatus);
-
-		//when result.status.status==3,means it has arrived a point successfully
-	}else if(current_position < num_goals-1 && result.status.status==3){
-		if(current_position==0){
-			ROS_INFO("Arrive at Start Point --- Current Position id : %d .",current_position);
-		}else{
-			ROS_INFO("Current Position id : %d .Watting for Callback from Pad ....",current_position);
-		}
-		
-		//send message to pad ,let pad to recognize face 
-		 xbot_navigoals::RobotStatus robotStatus;
-		 robotStatus.id = current_position;
-		 robotStatus.ismoving = false;
-		 arrive_goal_publisher.publish(robotStatus);
-
-		 //arrive at startpoint ,automaticlly go to next point 
-		 /*
-		 if(current_position==0){
-			   current_position++;
-			   execute_goal_publisher_.publish(goals[current_position]);
-		 }*/
-
-
-		 //current_position++;
-		 //execute_goal_publisher_.publish(goals[current_position]);
-		 start_point = goals[current_position];
-		 is_started = true;
-		 
-	}
-	
+  //reached goal success
+  switch (result.status.status) {
+  case 3:{
+    xbot_msgs::NaviState state;
+    state.subgoal_index = (++current_position < num_goals)?current_position:0;
+    current_position = (current_position <num_goals)?current_position:0;
+    reached_subgoal_publisher.publish(state);
+    ROS_INFO("Current Position id : %d .Watting for Callback from Pad ....",current_position);
+    //send message to pad ,let pad to recognize face or play voice
+    xbot_navigoals::RobotStatus robotStatus;
+    robotStatus.id = current_position;
+    robotStatus.ismoving = false;
+    arrive_goal_publisher.publish(robotStatus);
+    //have finished a path
+    if(current_position == num_goals-1){
+      if(is_started){
+        ROS_INFO("Finished a path.....");
+        is_started = false;
+      }
+    }
+    break;
+  }
+  case 4:
+    break;
+  default: break;
+  }
 }
 
 // Interact with xbot_head 
@@ -295,22 +273,19 @@ void NaviGoalCore::receiveSignStatus(const xbot_navigoals::SignStatus& signStatu
 			ROS_INFO("Face Recognition Success at Position : %d \n",current_position);
 			//means  a person's face has been corretly recognized
 			//turn to next point 
-			 current_position++;
-			 execute_goal_publisher_.publish(goals[current_position]);
-			 start_point = goals[current_position];      
+       execute_goal_publisher_.publish(goals[current_position+1]);
+//			 start_point = goals[current_position];
 	   }else {
 			ROS_INFO("Face Recognition Failure at Position :%d \n",current_position);
-			//face recognized failure
-			 current_position++;
-			 execute_goal_publisher_.publish(goals[current_position]);
-			 start_point = goals[current_position];         
+			//face recognized failure			 
+       execute_goal_publisher_.publish(goals[current_position+1]);
+//			 start_point = goals[current_position];
 	   } 
 	}else{
 		//cannot connect to face recognition server ,or timeout
 		ROS_INFO("Face Recognition Server Connection Timeout at Position :%d \n",current_position);
-		 current_position++;
-		 execute_goal_publisher_.publish(goals[current_position]);
-		 start_point = goals[current_position];       
+     execute_goal_publisher_.publish(goals[current_position+1]);
+//		 start_point = goals[current_position];
 	}
 
 }
@@ -318,11 +293,14 @@ void NaviGoalCore::receiveSignStatus(const xbot_navigoals::SignStatus& signStatu
 //subscribed topic "pad_audio_status" callback function
 void NaviGoalCore::receiveAudioStatus(const xbot_navigoals::AudioStatus& audioStatus){
 	if(audioStatus.iscomplete == true){
-		//ROS_INFO(" NO.%d audio completed.",audioStatus.id);
-		ROS_INFO(" Audio completed.");
-		current_position++;
-		execute_goal_publisher_.publish(goals[current_position]);
-		start_point = goals[current_position];
+    ROS_INFO(" NO.%d audio completed.",audioStatus.id);
+    if(current_position < num_goals-1){
+      execute_goal_publisher_.publish(goals[current_position+1]);
+    }
+    else{
+      execute_goal_publisher_.publish(goals[0]);
+    }
+
 	}
 
 }
@@ -364,7 +342,7 @@ void NaviGoalCore::clickedGoalReceived(const geometry_msgs::PoseStamped &pose)
 				}else{
 						ROS_ERROR("Can not call service!");
 				}
-			}else{
+      }/*else{
 				//means this is the first clicked point 
 				first_click_point = pose;
 	
@@ -384,7 +362,7 @@ void NaviGoalCore::clickedGoalReceived(const geometry_msgs::PoseStamped &pose)
 				}else{
 						ROS_ERROR("Can not call service!");
 				}
-			}
+      }*/
 			plans_publisher_.publish(navi_path);
 			//ROS_INFO("clickedGoalReceived  ----   Published navi_path  size :%d",navi_path.poses.size());
 		}else{
@@ -408,13 +386,20 @@ void NaviGoalCore::createGoalSerials()
 	if(click_goal_finished)
 	{
 		click_goal_finished=false;
-		num_goals=0;
-		current_position = 0;
+
 		arraymarker.markers.clear();
+    marker.header.stamp = ros::Time();
+    marker.id = num_goals;
+    marker.pose = start_point.pose;
+    arraymarker.markers.push_back(marker);
+    marker_goals_publisher_.publish( arraymarker );
+    goals[0] = start_point;
+    num_goals=1;
+    current_position = 0;
 		navi_path.poses.clear();
-		ROS_INFO("Initialized, please enter your goals.");
+    ROS_INFO("Initialized, start point has been added into goals, current goal number:1,please enter your goals.");
 	}else{
-		ROS_INFO("You are clicking a goal serial, want to clear them?, please press 'c' key!");
+    ROS_INFO("You are clicking a goal serial, want to clear them? please press 'c' key!");
 	}
 
 
@@ -465,12 +450,12 @@ void NaviGoalCore::completeGoals()
 
 	//push the first point(0,0) to the goals array,
 	//in order to make xbot move to the origin point after finishing a path 
-	goals[num_goals++] = first_click_point;
+//	goals[num_goals++] = first_click_point;
 	
 	click_goal_finished = true;
 	reached_goal = false;
 	
-	execute_goal_publisher_.publish(goals[0]);
+//  execute_goal_publisher_.publish(goals[1]);
 
 	ROS_INFO_STREAM("Click goals finished!");
 
