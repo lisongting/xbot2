@@ -264,6 +264,13 @@ void XbotRos::publishEchoData()
       msg.rear_left = data_echo.rear_left_echo;
       msg.rear_center = data_echo.rear_center_echo;
       msg.rear_right = data_echo.rear_right_echo;
+      msg.front_left_near = 0;
+      msg.front_center_near = 0;
+      msg.front_right_near = 0;
+      msg.rear_left_near = 0;
+      msg.rear_center_near = 0;
+      msg.rear_right_near = 0;
+
 
 //      int near_left = (data_echo.front_left_echo<=0.07)?1:0;
 //      int near_center = (data_echo.front_center_echo<=0.2)?2:0;
@@ -293,6 +300,12 @@ void XbotRos::publishInfraredData()
       msg.rear_left = data_core.rear_left_infred;
       msg.rear_center = data_core.rear_center_infred;
       msg.rear_right = data_core.rear_right_infred;
+      msg.front_left_hanged = (data_core.front_left_infred<1000);
+      msg.front_center_hanged = (data_core.front_center_infred<1000);
+      msg.front_right_hanged = (data_core.front_right_infred<1000);
+      msg.rear_left_hanged = (data_core.rear_left_infred<1000);
+      msg.rear_center_hanged = (data_core.rear_center_infred<1000);
+      msg.rear_right_hanged = (data_core.rear_right_infred<1000);
 
 
       infrared_data_publisher.publish(msg);

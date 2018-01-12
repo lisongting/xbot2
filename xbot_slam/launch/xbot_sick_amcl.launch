@@ -1,6 +1,5 @@
 <launch>
 	<!-- params configuration -->
-	<param name="/use_sim_time" value="false"/>
 	<include file="$(find xbot_bringup)/launch/xbot.launch" />
 	<include file="$(find xbot_bringup)/launch/sick.launch" />
 
