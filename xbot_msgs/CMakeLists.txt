@@ -17,6 +17,7 @@ add_message_files(DIRECTORY msg
                       Echos.msg
                       InfraRed.msg
                       NaviState.msg
+                      FaceResult.msg
                  )
 
 add_action_files(DIRECTORY action

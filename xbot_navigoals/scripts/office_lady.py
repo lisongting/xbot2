@@ -11,6 +11,8 @@ class office_lady():
 	"""docstring for office_lady"""
 	def __init__(self):
 		self.total_coll = input('please input total number of colleagues:\n')
+		# print type(self.total_coll)
+		# print self.total_coll
 		self.num_coll = 0
 		self.coll_position_dic = {}
 		self.marker=Marker()
@@ -25,7 +27,7 @@ class office_lady():
 		self.marker.header.frame_id='map'
 		self.marker.type=Marker.SPHERE_LIST
 		self.marker.action=Marker.ADD
-		self.markers = MarkerArray()
+		self.arraymarker = MarkerArray()
 		self.markers_pub = rospy.Publisher('/coll_position',MarkerArray,queue_size=1)
 		self.goal_sub = rospy.Subscriber('/mark_coll_position',PoseStamped, self.mark_coll_positionCB)
 		# f = open('param/col_pos.yaml')
@@ -36,31 +38,33 @@ class office_lady():
 		# 	print 'please input the pose of every colleague with 2DNavi goal...'
 		# 	print 'the first colleague is '+ col_poses.pose[0]
 		
-		tip = 'please input NO '+ num_coll + 'colleague name:\n'
+		tip = 'please input NO '+ str(self.num_coll) + 'colleague name:\n'
 		self.name = input(tip)
-		tip = 'please input the pose of NO' + num_coll +' with 2DNavi goal tool in rviz'
+		tip = 'please input the pose of NO ' + str(self.num_coll) +' with 2DNavi goal tool in rviz'
 		print tip
+		rospy.spin()
 
 	def mark_coll_positionCB(self, pos):
 		if self.num_coll < self.total_coll:
-			self.coll_position_dic[self.name] = pos.pose
-			self.num_coll++
-			print 'added '+num_coll+' colleagues'
-			print coll_position_dic
+			self.coll_position_dic[self.name] = [[pos.pose.position.x,pos.pose.position.y,pos.pose.position.z],[pos.pose.orientation.x,pos.pose.orientation.y,pos.pose.orientation.z,pos.pose.orientation.w]]
+			self.num_coll+=1
+			print 'added '+str(self.num_coll)+' colleagues'
+			print self.coll_position_dic
 			self.marker.header.stamp =rospy.Time.now()
 			self.marker.pose = pos.pose
-			self.marker.id = num_coll - 1
-			self.markers.pushback(self.marker)
-			markers_pub.publish(self.markers)
-			tip = 'please input NO '+ num_coll + 'colleague name:\n'
-			self.name = input(tip)
-			tip = 'please input the pose of NO' + num_coll +' with 2DNavi goal tool in rviz'
-			print tip
-		else:
-			f=open('coll_position_dic.yaml', 'w')
-			yaml.dump(self.coll_position_dic, f)
-			f.close()
-			sys.exit()
+			self.marker.id = self.num_coll - 1
+			self.arraymarker.markers.append(self.marker)
+			self.markers_pub.publish(self.arraymarker)
+			if self.num_coll < self.total_coll:
+				tip = 'please input NO '+ str(self.num_coll) + 'colleague name:\n'
+				self.name = input(tip)
+				tip = 'please input the pose of NO' + str(self.num_coll) +' with 2DNavi goal tool in rviz'
+				print tip
+			else:
+				f=open('coll_position_dic.yaml', 'w')
+				yaml.dump(self.coll_position_dic, f)
+				f.close()
+				print 'all colleagues position are marked and saved, please press ctrl+c to exit... '
 
 
 
