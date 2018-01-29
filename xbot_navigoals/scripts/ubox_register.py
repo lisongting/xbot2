@@ -45,17 +45,3 @@ cap.release()
 cv2.destroyAllWindows()
 
 
-if (len(image) != 0):
-		image_binary = str()
-		with open(image, "rb") as fp:
-				image_binary = fp.read()av
-				image_binary = base64.b64encode(image_binary)
-				post_data["Image"] = image_binary
-		if post_data:
-				body = JSONEncoder().encode(post_data)
-		req = urllib2.Request(url, body)
-		response = urllib2.urlopen(req)
-		buf = response.read()
-		body = JSONDecoder().decode(buf)
-print body["Ret"]
-

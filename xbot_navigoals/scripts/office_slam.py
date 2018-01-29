@@ -15,13 +15,13 @@ class office_slam():
 		self.next_loop_pub = rospy.Publisher('/office/next_loop', UInt32, queue_size=1)
 		self.goal_reached_pub = rospy.Publisher('/office/goal_reached', String, queue_size=1)
 		self.move_base_goal_pub = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=1)
-		self.move_base_result_sub = rospy.Subscriber('/move_base/result', MoveBaseActionResult, move_base_resultCB)
+		self.move_base_result_sub = rospy.Subscriber('/move_base/result', MoveBaseActionResult, self.move_base_resultCB)
 		self.goal_name_sub = rospy.Subscriber('/office/goal_name', String, self.goal_nameCB)
 		self.coll_position_dict = dict()
 		self.current_goal = []
 		self.loop_times = UInt32()
 		self.loop_times.data = 0
-		f = open('/home/roc/ros_kinetic_ws/src/xbot2/xbot_navigoals/scripts/coll_position_dic.yaml', 'r')
+		f = open('/home/rocwang/catkin_ws/src/xbot2/xbot_navigoals/scripts/coll_position_dic.yaml', 'r')
 		self.coll_position_dict = yaml.load(f)
 		f.close()
 		rospy.spin()
@@ -29,8 +29,15 @@ class office_slam():
 	def goal_nameCB(self, name):
 		pos = self.coll_position_dict[name.data]
 		goal = PoseStamped()
-		goal.pose.position = pos[0]
-		goal.pose.orientation = pos[1]
+		goal.header.frame_id = 'map'
+		goal.pose.position.x = pos[0][0]
+		goal.pose.position.y = pos[0][1]
+		goal.pose.position.z = pos[0][2]
+		goal.pose.orientation.x = pos[1][0]
+		goal.pose.orientation.y = pos[1][1]
+		goal.pose.orientation.z = pos[1][2]
+		goal.pose.orientation.w = pos[1][3]
+		print goal
 		self.move_base_goal_pub.publish(goal)
 		self.current_goal = [name, goal]
 
@@ -38,7 +45,7 @@ class office_slam():
 	def move_base_resultCB(self, result):
 		if result.status.status == 3:
 			#success
-			self.goal_reached_pub(self.current_goal[0])
+			self.goal_reached_pub.publish(self.current_goal[0])
 			if self.current_goal[0].data == 'origin':
 				self.loop_times.data += 1
 				self.next_loop_pub.publish(self.loop_times)
@@ -46,7 +53,7 @@ class office_slam():
 			#failed
 			msg = String()
 			msg.data = 'abort'
-			self.goal_reached_pub(msg)
+			self.goal_reached_pub.publish(msg)
 
 
 

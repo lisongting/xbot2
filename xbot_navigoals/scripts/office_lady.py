@@ -6,6 +6,7 @@ import yaml
 
 from geometry_msgs.msg import Pose, PoseStamped
 from visualization_msgs.msg import Marker, MarkerArray
+from move_base_msgs.msg import MoveBaseActionResult
 
 class office_lady():
 	"""docstring for office_lady"""
@@ -30,6 +31,7 @@ class office_lady():
 		self.arraymarker = MarkerArray()
 		self.markers_pub = rospy.Publisher('/coll_position',MarkerArray,queue_size=1)
 		self.goal_sub = rospy.Subscriber('/mark_coll_position',PoseStamped, self.mark_coll_positionCB)
+		# self.goal_result_sub = rospy.Subscriber('/move_base/result', MoveBaseActionResult, self.goal_resultCB)
 		# f = open('param/col_pos.yaml')
 		# self.col_poses = yaml.load(f)
 		# if col_poses is not NULL:
@@ -45,6 +47,7 @@ class office_lady():
 		rospy.spin()
 
 	def mark_coll_positionCB(self, pos):
+
 		if self.num_coll < self.total_coll:
 			self.coll_position_dic[self.name] = [[pos.pose.position.x,pos.pose.position.y,pos.pose.position.z],[pos.pose.orientation.x,pos.pose.orientation.y,pos.pose.orientation.z,pos.pose.orientation.w]]
 			self.num_coll+=1
@@ -65,6 +68,8 @@ class office_lady():
 				yaml.dump(self.coll_position_dic, f)
 				f.close()
 				print 'all colleagues position are marked and saved, please press ctrl+c to exit... '
+	def goal_resultCB(self, result):
+		pass
 
 
 

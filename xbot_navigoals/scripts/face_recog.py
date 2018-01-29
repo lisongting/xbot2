@@ -9,7 +9,7 @@ from json import *
 from xbot_msgs.msg import FaceResult
 from std_msgs.msg import String, UInt32
 
-url = "http://172.16.0.143:8000/recognition"
+url = "http://172.16.0.141:8000/recognition"
 
 
 
@@ -24,7 +24,7 @@ class face_recog():
 
 
 	def next_loopCB(self, loop_count):
-		cap = cv2.VideoCapture(1)
+		cap = cv2.VideoCapture(0)
 		msg = FaceResult()
 		while True:
 			# Capture frame-by-frame
@@ -39,9 +39,11 @@ class face_recog():
 				req = urllib2.Request(url, body)
 				response = urllib2.urlopen(req).read()
 				body = JSONDecoder().decode(response)
+
 			if body['Id'] == 'UNKNOWN':
 				continue
 			elif body['Confidence'] >0.6:
+				print body
 				msg.is_staff = 1
 				msg.name = body['Id']
 				self.face_result_pub.publish(msg)

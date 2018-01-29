@@ -6,9 +6,9 @@ import os, base64, urllib2
 from json import *
 
 
-url = "http://172.16.0.143:8000/recognition"
+url = "http://172.16.0.141:8000/recognition"
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 total_time=0
 test_num = 30
 for i in xrange(1,test_num+1):
