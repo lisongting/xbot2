@@ -41,7 +41,7 @@ const char* subscribe_topic_goal = "/office/goal_reached";
 const char* subscribe_topic_face_recog ="/office/face_result";
 const char* goal_name_pub_topic ="/office/goal_name";//携带的数据为拼音
 const char* next_loop_pub_topic = "/office/next_loop";
-string basePath = "/home/rocwang/catkin_ws/src/talker";
+string basePath = "/home/lee/catkin_ws/src/xbot2/talker";
 //string basePath;
 ros::Publisher goal_name_pub;
 ros::Publisher next_loop_pub;
@@ -57,8 +57,10 @@ unsigned int g_buffersize = BUFFER_SIZE;
 int ret;
 bool isInteracting;
 bool isPlayingAudio;
-bool getGoal;
+bool getGoal;//表示是否得到目标位置点
+bool isRecordTimeout;//表示对话交互是否超时
 string lastGoal;
+int recordCount = 0;
 
 int main(int argc,char** argv){
     ros::init(argc,argv,"talker");
@@ -106,9 +108,10 @@ void onGoalReached(const std_msgs::String& msg){
 }
 
 void onGetFaceResult(const xbot_msgs::FaceResult& faceResult){
+
     if(!isInteracting){
         getGoal = false;
-        cout<<"getFaceResult:"<<faceResult.is_staff<<" "<<faceResult.name<<endl;
+        cout<<"getFaceResult:"<<faceResult.name<<endl;
         string staffName = faceResult.name;
         talker.greetByName(staffName,&onPlayFinished);
 
@@ -135,6 +138,8 @@ void onPlayFinished(int code,string message){
         case REQUEST_GREET_VISITOR:
         {
             cout<<"REQUEST_GREET_VISITOR"<<endl;
+            recordCount = 0;
+            isRecordTimeout = false;
             while(!getGoal){
                 signal(SIGINT,signal_handler);
                 //开启录音，进行语音识别
@@ -149,6 +154,13 @@ void onPlayFinished(int code,string message){
                     continue;
                 }
 
+                if(isRecordTimeout){
+                    cout<<"-----------Interacting Timeout. Stop Chatting --------"<<endl;
+                    std_msgs::UInt32 msg;
+                    msg.data = 255;
+                    next_loop_pub.publish(msg);
+                    break;
+                }
                 cout<<"-----------Stop Chatting--------"<<endl;
             }
         }
@@ -257,14 +269,14 @@ void start_recording(const char* session_begin_params){
    }
 
    sr_uninit(&iat);
-   cout<<"WAKE UP.   isPlaying:"<<isPlayingAudio<<endl;
+   cout<<"WAKE UP .   "<<endl;
 
    if(isPlayingAudio){
        cout<<"sleep   tid: "<<this_thread::get_id()<<endl;
        //unique_lock<mutex> lock2(m2);
 //       condition2.wait(lock2,[]{return !isPlayingAudio;});
    }
-   cout<<"WAKE  start_recording"<<endl;
+
    //如果十秒没有语音输入，则手动调用on_speech_end,
    //在on_speech_end中将isInteracting置为false，
    //从而将主线程唤醒，开启下一轮的录音
@@ -290,6 +302,8 @@ void on_result(const char *result, char is_last){
 
         strncat(g_result, result, size);
         if(is_last){
+            isRecordTimeout = false;
+            recordCount = 0;
             cout<<"result : "<<g_result<<endl;
             talker.chat(g_result,onPlayFinished);
         }
@@ -313,7 +327,13 @@ void on_speech_begin(){
 void on_speech_end(int reason){
 //     cout<<"on_speech_end       ----  pid :"<<getpid()<<" ,tid: "<<this_thread::get_id()<<endl;
 //     cout<<"On speech end -- code:"<<reason<<endl;
-     cout<<"isPlayingAudio:"<<isPlayingAudio<<endl;
+//     cout<<"isPlayingAudio:"<<isPlayingAudio<<endl;
+     if(reason==1000 ){
+         recordCount++;
+     }
+     if(recordCount==6){
+         isRecordTimeout = true;
+     }
 
      if(isInteracting ){
          isInteracting = false;
