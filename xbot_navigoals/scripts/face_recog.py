@@ -40,7 +40,7 @@ class face_recog():
 				response = urllib2.urlopen(req).read()
 				body = JSONDecoder().decode(response)
 
-			if body['Id'] == 'UNKNOWN':
+			if body['Id'] == 'UNKNOWN' or body['Id'] == 'None':
 				continue
 			elif body['Confidence'] >0.6:
 				print body

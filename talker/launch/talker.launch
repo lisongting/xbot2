@@ -1,0 +1,11 @@
+<launch>
+	
+
+
+	<node name="talker" pkg="talker" type="talker">
+	<param name="base_path" type="str"  value="$(find talker)" />
+	</node>
+
+	
+
+</launch>
