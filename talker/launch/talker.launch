@@ -1,11 +1,6 @@
 <launch>
-	
-
-
 	<node name="talker" pkg="talker" type="talker">
-	<param name="base_path" type="str"  value="$(find talker)" />
+		<param name="base_path" value="$(find talker)" />
 	</node>
-
-	
-
+	<node name = "face_recog" pkg = "xbot_navigoals" type = "face_recog.py" />
 </launch>

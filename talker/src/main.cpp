@@ -72,7 +72,7 @@ int main(int argc,char** argv){
     faceRecogSubscriber = nodeHandle.subscribe(subscribe_topic_face_recog,10,onGetFaceResult);
     goalReachSubscriber = nodeHandle.subscribe(subscribe_topic_goal,10,onGoalReached);
 
-//    nodeHandle.param("base_path",basePath);
+    nodeHandle.param("/talker/base_path",basePath, string("/home/xbot/catkin_ws/src/xbot2/talker"));
 //    ROS_ERROR("%s\n",basePath.c_str());
 //    cout<<"basePath: "<<basePath<<endl;
     ret = talker.init(basePath);
