@@ -72,7 +72,8 @@ int main(int argc,char** argv){
     faceRecogSubscriber = nodeHandle.subscribe(subscribe_topic_face_recog,10,onGetFaceResult);
     goalReachSubscriber = nodeHandle.subscribe(subscribe_topic_goal,10,onGoalReached);
 
-    nodeHandle.param("/talker/base_path",basePath, string("/home/xbot/catkin_ws/src/xbot2/talker"));
+    nodeHandle.param("/talker/base_path",basePath, string("/home/lee/catkin_ws/src/xbot2/talker"));
+//    nodeHandle.param("/talker/base_path",basePath, string("/home/xbot/catkin_ws/src/xbot2/talker"));
 //    ROS_ERROR("%s\n",basePath.c_str());
 //    cout<<"basePath: "<<basePath<<endl;
     ret = talker.init(basePath);
@@ -120,6 +121,7 @@ void onGetFaceResult(const xbot_msgs::FaceResult& faceResult){
 }
 
 void onPlayFinished(int code,string message){
+    cout<<"onPlayFinished  ---- tid: "<<this_thread::get_id()<<endl;
     //cout<<"code: "<<code<<endl;
     cout<<"message:"<<message<<endl;
     std_msgs::String mes;
@@ -131,7 +133,6 @@ void onPlayFinished(int code,string message){
             std_msgs::UInt32 msg;
             msg.data = 255;
             next_loop_pub.publish(msg);
-
 
         }
         break;
@@ -229,7 +230,7 @@ void onPlayFinished(int code,string message){
 
 //开始录音，其目的是将用户说的话转换成文字
 void start_recording(const char* session_begin_params){
-//   cout<<"start recording  ----  pid :"<<getpid()<<" ,tid: "<<this_thread::get_id()<<endl;
+   cout<<"start recording  ---- tid: "<<this_thread::get_id()<<endl;
    string login_parameters = "appid = 5a52e95f, work_dir = "+basePath+"/assets";
    int ret = MSPLogin(NULL, NULL, login_parameters.c_str());
    if (MSP_SUCCESS != ret)	{
@@ -283,9 +284,11 @@ void start_recording(const char* session_begin_params){
    on_speech_end(1000);
 }
 
+
+
 //语音识别的结果回调
 void on_result(const char *result, char is_last){
-//    cout<<"on_result       ----  pid :"<<getpid()<<" ,tid: "<<this_thread::get_id()<<endl;
+    cout<<"on_result       ----  tid: "<<this_thread::get_id()<<endl;
     //cout<<"Speech recognition result: "<<result<<"    is_last"<<is_last<<endl;
     if(result){
         size_t left = g_buffersize - 1 - strlen(g_result);
@@ -325,7 +328,7 @@ void on_speech_begin(){
 
 //语音识别结束
 void on_speech_end(int reason){
-//     cout<<"on_speech_end       ----  pid :"<<getpid()<<" ,tid: "<<this_thread::get_id()<<endl;
+     cout<<"on_speech_end     ----  tid: "<<this_thread::get_id()<<endl;
 //     cout<<"On speech end -- code:"<<reason<<endl;
 //     cout<<"isPlayingAudio:"<<isPlayingAudio<<endl;
      if(reason==1000 ){

@@ -142,6 +142,10 @@ int Talker::chat(string  chatMsg,on_play_finished callback) {
                 cout<<"Error occurs when parsing the "<<i<<" object from dictionary"<<endl;
             }
         }
+        string audiofile = basePath+"/assets/wav/hard.wav";
+        play((char*)audiofile.c_str(),REQUEST_CHAT,callback);
+        return 0;
+
     }else{
         cout<<"Cannot get dictionary from json file"<<endl;
     }
@@ -200,7 +204,7 @@ int Talker::informWhenReachGoal(string name,on_play_finished callback){
 
 //播放一个指定路径的文件
 int Talker::play(char* file,int requestCode,on_play_finished  callback){
-//     cout<<"Talker  talk()     ----  pid :"<<getpid()<<" ,tid: "<<this_thread::get_id()<<endl;
+    cout<<"Talker  talk()  tid: "<<this_thread::get_id()<<endl;
     cout<<"Start talking.......   "<<file<<endl;
 
     FILE*   fp  = NULL;
