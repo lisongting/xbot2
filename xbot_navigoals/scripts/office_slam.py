@@ -8,6 +8,7 @@ from std_msgs.msg import String, UInt32
 from geometry_msgs.msg import Pose, PoseStamped
 from actionlib_msgs.msg import GoalStatusArray
 from move_base_msgs.msg import MoveBaseActionResult
+from std_srvs.msg import Empty
 
 class office_slam():
 	"""docstring for office_slam"""
@@ -17,6 +18,7 @@ class office_slam():
 		self.move_base_goal_pub = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=1)
 		self.move_base_result_sub = rospy.Subscriber('/move_base/result', MoveBaseActionResult, self.move_base_resultCB)
 		self.goal_name_sub = rospy.Subscriber('/office/goal_name', String, self.goal_nameCB)
+		self.clear_costmap_srv = rospy.ServiceProxy('/move_base/clear_costmaps', Empty)
 		self.coll_position_dict = dict()
 		self.current_goal = []
 		self.loop_times = UInt32()
@@ -42,6 +44,8 @@ class office_slam():
 		goal.pose.orientation.z = pos[1][2]
 		goal.pose.orientation.w = pos[1][3]
 		print goal
+		empty = Empty()
+		self.clear_costmap_srv(empty)
 		self.move_base_goal_pub.publish(goal)
 		self.current_goal = [name, goal]
 

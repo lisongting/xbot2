@@ -288,7 +288,7 @@ void SafetyController::spin()
       msg_->linear.z = 0.0;
       msg_->angular.x = 0.0;
       msg_->angular.y = 0.0;
-      msg_->angular.z = -0.4;
+      msg_->angular.z = 0.4;
       velocity_command_publisher_.publish(msg_);
     }
     else if (bumper_right_pressed_ || cliff_right_detected_)
@@ -300,7 +300,7 @@ void SafetyController::spin()
       msg_->linear.z = 0.0;
       msg_->angular.x = 0.0;
       msg_->angular.y = 0.0;
-      msg_->angular.z = 0.4;
+      msg_->angular.z = -0.4;
       velocity_command_publisher_.publish(msg_);
     }
     //if we want to extend the safety state and we're within the time, just keep sending msg_
