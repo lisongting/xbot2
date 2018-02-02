@@ -8,7 +8,7 @@ from std_msgs.msg import String, UInt32
 from geometry_msgs.msg import Pose, PoseStamped
 from actionlib_msgs.msg import GoalStatusArray
 from move_base_msgs.msg import MoveBaseActionResult
-from std_srvs.msg import Empty
+from std_srvs.srv import Empty
 
 class office_slam():
 	"""docstring for office_slam"""
