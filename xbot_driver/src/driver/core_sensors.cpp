@@ -128,63 +128,45 @@ bool CoreSensors::deserialise(ecl::PushAndPop<unsigned char> & byteStream)
 
 //  rear right
   buildVariable(tempvariable,byteStream);
-  if(queue_rear_right_echo.isImpulse(tempvariable)){
-    queue_rear_right_echo.lpush(queue_rear_right_echo.mean());
-  }
-  else{
-    queue_rear_right_echo.lpush(tempvariable);
-  }
+
+  queue_rear_right_echo.lpush(tempvariable);
+
   data.rear_right_echo = queue_rear_right_echo.mean();
 
 //  rear center
   buildVariable(tempvariable,byteStream);
-  if(queue_rear_center_echo.isImpulse(tempvariable)){
-    queue_rear_center_echo.lpush(queue_rear_center_echo.mean());
-  }
-  else{
-    queue_rear_center_echo.lpush(tempvariable);
-  }
+
+  queue_rear_center_echo.lpush(tempvariable);
+
   data.rear_center_echo = queue_rear_center_echo.mean();
 
 //  rear left
   buildVariable(tempvariable,byteStream);
-  if(queue_rear_left_echo.isImpulse(tempvariable)){
-    queue_rear_left_echo.lpush(queue_rear_left_echo.mean());
-  }
-  else{
-    queue_rear_left_echo.lpush(tempvariable);
-  }
+
+  queue_rear_left_echo.lpush(tempvariable);
+
   data.rear_left_echo = queue_rear_left_echo.mean();
 
 //  front left
   buildVariable(tempvariable,byteStream);
-  if(queue_front_left_echo.isImpulse(tempvariable)){
-    queue_front_left_echo.lpush(queue_front_left_echo.mean());
-  }
-  else{
-    queue_front_left_echo.lpush(tempvariable);
-  }
+
+  queue_front_left_echo.lpush(tempvariable);
+
   data.front_left_echo = queue_front_left_echo.mean();
 
 
 //  front center
   buildVariable(tempvariable,byteStream);
-  if(queue_front_center_echo.isImpulse(tempvariable)){
-    queue_front_center_echo.lpush(queue_front_center_echo.mean());
-  }
-  else{
-    queue_front_center_echo.lpush(tempvariable);
-  }
+
+  queue_front_center_echo.lpush(tempvariable);
+
   data.front_center_echo = queue_front_center_echo.mean();
 
 //  front right
   buildVariable(tempvariable,byteStream);
-  if(queue_front_right_echo.isImpulse(tempvariable)){
-    queue_front_right_echo.lpush(queue_front_right_echo.mean());
-  }
-  else{
-    queue_front_right_echo.lpush(tempvariable);
-  }
+
+  queue_front_right_echo.lpush(tempvariable);
+
   data.front_right_echo = queue_front_right_echo.mean();
 
 //  std::cout<<"front_center_echo:"<<data.front_center_echo<<std::endl;

@@ -214,12 +214,13 @@ void XbotRos::publishRobotState()
         msg->rear_center_hanged = (data.rear_center_infred<1000);
         msg->rear_right_hanged = (data.rear_right_infred<1000);
         msg->is_hanged = msg->front_left_hanged&&msg->front_center_hanged&&msg->front_right_hanged&&msg->rear_left_hanged&&msg->rear_center_hanged&&msg->rear_right_hanged;
-        msg->front_left_near = data.front_left_echo;
-        msg->front_center_near = data.front_center_echo;
-        msg->front_right_near = data.front_right_echo;
-        msg->rear_left_near = data.rear_left_echo;
-        msg->rear_center_near = data.rear_center_echo;
-        msg->rear_right_near = data.rear_right_echo;
+        msg->front_left_near = (data.front_left_echo<1300);
+        msg->front_center_near = (data.front_center_echo<1300);
+        msg->front_right_near = (data.front_right_echo<1300);
+        msg->rear_left_near = (data.rear_left_echo<1300);
+        msg->rear_center_near = (data.rear_center_echo<1300);
+        msg->rear_right_near = (data.rear_right_echo<1300);
+        msg->is_obstacle = msg->front_left_near&&msg->front_center_near&&msg->front_right_near&&msg->rear_left_near&&msg->rear_center_near&&msg->rear_right_near;
 
         robot_state_publisher.publish(msg);
 //        r.sleep();
@@ -264,12 +265,12 @@ void XbotRos::publishEchoData()
       msg.rear_left = data_echo.rear_left_echo;
       msg.rear_center = data_echo.rear_center_echo;
       msg.rear_right = data_echo.rear_right_echo;
-      msg.front_left_near = 0;
-      msg.front_center_near = 0;
-      msg.front_right_near = 0;
-      msg.rear_left_near = 0;
-      msg.rear_center_near = 0;
-      msg.rear_right_near = 0;
+      msg.front_left_near = (data_echo.front_left_echo<1300);
+      msg.front_center_near = (data_echo.front_center_echo<1300);
+      msg.front_right_near = (data_echo.front_right_echo<1300);
+      msg.rear_left_near = (data_echo.rear_left_echo<1300);
+      msg.rear_center_near = (data_echo.rear_center_echo<1300);
+      msg.rear_right_near = (data_echo.rear_right_echo<1300);
 
 
 //      int near_left = (data_echo.front_left_echo<=0.07)?1:0;
