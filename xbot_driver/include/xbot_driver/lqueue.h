@@ -1,7 +1,9 @@
 #ifndef LQUEUE_H
 #define LQUEUE_H
 #define MAX_L 100
+#include "math.h"
 template<typename T>
+
 class lqueue
 {
 public:
@@ -47,7 +49,8 @@ public:
         return false;
       }
       else{
-        return ((node - this->mean()) > 0.12*this->mean());
+
+        return (abs(node - this->mean()) > 0.12*this->mean());
       }
 
     }
