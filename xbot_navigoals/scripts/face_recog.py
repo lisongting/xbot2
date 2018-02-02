@@ -9,7 +9,7 @@ from json import *
 from xbot_msgs.msg import FaceResult
 from std_msgs.msg import String, UInt32
 
-url = "http://172.16.0.141:8000/recognition"
+url = "http://172.16.0.143:8000/recognition"
 
 
 
@@ -39,6 +39,7 @@ class face_recog():
 				req = urllib2.Request(url, body)
 				response = urllib2.urlopen(req).read()
 				body = JSONDecoder().decode(response)
+				rospy.loginfo(body)
 
 			if body['Id'] == 'UNKNOWN' or body['Id'] == 'None':
 				continue

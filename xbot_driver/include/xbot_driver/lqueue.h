@@ -42,6 +42,15 @@ public:
 
 
     }
+    bool isImpulse(T node){
+      if(size == 0){
+        return false;
+      }
+      else{
+        return ((node - this->mean()) > 0.12*this->mean());
+      }
+
+    }
     T medium(){
         T tdata[MAX_L];
         for(int i=0;i<size;i++)

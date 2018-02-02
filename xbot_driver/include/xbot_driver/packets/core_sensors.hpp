@@ -44,7 +44,13 @@ public:
     queue_rear_center_infrared(25),
     queue_rear_right_infrared(25),
     queue_dock_left_infrared(25),
-    queue_dock_right_infrared(25)
+    queue_dock_right_infrared(25),
+    queue_front_left_echo(25),
+    queue_front_center_echo(25),
+    queue_front_right_echo(25),
+    queue_rear_left_echo(25),
+    queue_rear_center_echo(25),
+    queue_rear_right_echo(25)
     {};
 
   struct Data {
@@ -94,6 +100,7 @@ public:
      short roll;
      unsigned short timestamp;
   } data;
+//  infrared queue
   lqueue <uint> queue_front_left_infrared;
   lqueue <uint> queue_front_center_infrared;
   lqueue <uint> queue_front_right_infrared;
@@ -102,6 +109,15 @@ public:
   lqueue <uint> queue_rear_right_infrared;
   lqueue <uint> queue_dock_left_infrared;
   lqueue <uint> queue_dock_right_infrared;
+
+//  echo queue
+  lqueue <uint> queue_front_left_echo;
+  lqueue <uint> queue_front_center_echo;
+  lqueue <uint> queue_front_right_echo;
+  lqueue <uint> queue_rear_left_echo;
+  lqueue <uint> queue_rear_center_echo;
+  lqueue <uint> queue_rear_right_echo;
+
   struct Flags {
       // Charging source
       // - first four bits distinguish between adapter or docking base charging

@@ -21,9 +21,13 @@ class office_slam():
 		self.current_goal = []
 		self.loop_times = UInt32()
 		self.loop_times.data = 0
-		f = open('/home/rocwang/catkin_ws/src/xbot2/xbot_navigoals/scripts/coll_position_dic.yaml', 'r')
+		yaml_path = rospy.get_param('/office_slam/yaml_file_path')
+		yaml_path = yaml_path + '/scripts/coll_position_dic.yaml'
+		f = open(yaml_path, 'r')
 		self.coll_position_dict = yaml.load(f)
 		f.close()
+		# self.loop_times.data+=1
+		# self.next_loop_pub.publish(self.loop_times)
 		rospy.spin()
 
 	def goal_nameCB(self, name):

@@ -7,7 +7,7 @@ import base64
 import urllib2
 from json import *
 
-url = "http://172.16.0.141:8000/management/register?method=normal"
+url = "http://172.16.0.143:8000/management/register?method=normal"
 cap = cv2.VideoCapture(0)
 body = str()
 post_data = dict()
@@ -16,7 +16,7 @@ while(True):
 	# Capture frame-by-frame
 	ret, frame = cap.read()
 
-	# Our operations on the frame come here
+	# Our operations on the frame com`e here
 	# gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 	# Display the resulting frame
