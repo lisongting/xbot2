@@ -83,7 +83,7 @@ int Talker::init(string basepath){
         cout<<"Parsing Json Error  ---  Invalid json file :"<<file_greet<<endl;
         return -1;
     }else{
-        cout<<"Parse Json success"<<endl;
+        cout<<"Parse  json success"<<endl;
     }
 //    cout<<json_dictionary<<endl;
 //    cout<<json_greeting<<endl;
@@ -204,7 +204,7 @@ int Talker::informWhenReachGoal(string name,on_play_finished callback){
 
 //播放一个指定路径的文件
 int Talker::play(char* file,int requestCode,on_play_finished  callback){
-    cout<<"Talker  talk()  tid: "<<this_thread::get_id()<<endl;
+//    cout<<"Talker  talk()  tid: "<<this_thread::get_id()<<endl;
     cout<<"Start talking.......   "<<file<<endl;
 
     FILE*   fp  = NULL;
