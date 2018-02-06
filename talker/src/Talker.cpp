@@ -87,11 +87,13 @@ int Talker::init(string basepath){
     }
 //    cout<<json_dictionary<<endl;
 //    cout<<json_greeting<<endl;
-    while(uploadHotWords()==-1){
-        signal(SIGINT,sig_handler);
-        sleep(5);
-        cout<<"Upload hot words failed. Retrying"<<endl;
-    }
+
+    //如果是离线语音识别，这里不需要上传热词
+//    while(uploadHotWords()==-1){
+//        signal(SIGINT,sig_handler);
+//        sleep(5);
+//        cout<<"Upload hot words failed. Retrying"<<endl;
+//    }
     return 0;
 }
 

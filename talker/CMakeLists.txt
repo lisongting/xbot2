@@ -202,7 +202,7 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-set(SOURCE src/linuxrec.cpp src/main.cpp src/speech_recognizer.cpp src/Talker.cpp)
+set(SOURCE src/linuxrec.cpp src/main.cpp src/speech_recognizer.cpp src/Talker.cpp src/tinyxml2.cpp)
 
 link_directories(/usr/local/lib ${PROJECT_SOURCE_DIR}/lib)
 

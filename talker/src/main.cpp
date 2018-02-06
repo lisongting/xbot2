@@ -12,21 +12,43 @@
 #include <condition_variable>
 #include <pthread.h>
 #include <signal.h>
+#include <errno.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <std_msgs/UInt32.h>
 #include <xbot_msgs/FaceResult.h>
+#include "qisr.h"
+#include "msp_cmn.h"
+#include "msp_errors.h"
+#include "tinyxml2.h"
+
 
 //#include "../include/AIUITest.h"
 //#include "../include/rapidjson/writer.h"
 //#include "../include/rapidjson/stringbuffer.h"
 //#include "../include/Talker.h"
 //#include "../include/speech_recognizer.h"
-
+//#include "../include/qisr.h"
+//#include "../include/msp_cmn.h"
+//#include "../include/msp_errors.h"
+//#include "../include/tinyxml2.h"
 
 using namespace std;
+using namespace tinyxml2;
 #define FRAME_LEN	640
 #define	BUFFER_SIZE	4096
+#define SAMPLE_RATE_16K     16000
+#define SAMPLE_RATE_8K      8000
+#define MAX_GRAMMARID_LEN   32
+#define MAX_PARAMS_LEN      1024
+
+typedef struct _UserData {
+    int     build_fini; //标识语法构建是否完成
+    int     update_fini; //标识更新词典是否完成
+    int     errcode; //记录语法构建或更新词典回调错误码
+    char  grammar_id[MAX_GRAMMARID_LEN]; //保存语法构建返回的语法ID
+}UserData;
+
 
 void onGoalReached(const std_msgs::String& msg);
 void onGetFaceResult(const xbot_msgs::FaceResult& faceResult);
@@ -34,9 +56,13 @@ void onPlayFinished(int code,string message);
 void on_result(const char *result, char is_last);
 void on_speech_begin();
 void on_speech_end(int reason);
-void start_recording( char* session_begin_params);
 void signal_handler(int s);
 void* record_thread(void* session_begin_params);
+
+void* offline_voice_recog_thread(void* session_begin_params);
+int build_grm_cb(int ecode, const char *info, void *udata);
+int build_grammar(UserData *udata);
+const char* parse_result_from_xml(char*  xmlContent);
 
 const char* subscribe_topic_goal = "/office/goal_reached";
 const char* subscribe_topic_face_recog ="/office/face_result";
@@ -63,6 +89,13 @@ condition_variable condition_chat , condition_playing_audio;
 bool isChatting;
 pthread_t record_thread_id;
 
+ UserData asr_data;
+string ASR_RES_PATH  ; //离线语法识别资源路径
+string GRAMMAR_BUILD_PATH ; //构建离线语法识别网络生成数据保存路径
+string GRAMMAR_FILE   ; //构建离线识别语法网络所用的语法文件
+//string LEX_NAME            = "contact"; //更新离线识别语法的contact槽
+char asr_params[MAX_PARAMS_LEN];
+
 int main(int argc,char** argv){
     ros::init(argc,argv,"talker");
     ros::NodeHandle nodeHandle;
@@ -72,9 +105,8 @@ int main(int argc,char** argv){
     faceRecogSubscriber = nodeHandle.subscribe(subscribe_topic_face_recog,10,onGetFaceResult);
     goalReachSubscriber = nodeHandle.subscribe(subscribe_topic_goal,10,onGoalReached);
 
-//    nodeHandle.param("/talker/base_path",basePath, string("/home/lee/catkin_ws/src/xbot2/talker"));
-    nodeHandle.param("/talker/base_path",basePath, string("/home/xbot/catkin_ws/src/xbot2/talker"));
-//    ROS_ERROR("%s\n",basePath.c_str());
+    nodeHandle.param("/talker/base_path",basePath, string("/home/lee/catkin_ws/src/xbot2/talker"));
+//    nodeHandle.param("/talker/base_path",basePath, string("/home/xbot/catkin_ws/src/xbot2/talker"));
     ret = talker.init(basePath);
     if(ret==-1){
         cout<<"Talker init failed"<<endl;
@@ -82,14 +114,183 @@ int main(int argc,char** argv){
     }else{
         cout<<"Talker init success"<<endl;
     }
+    ASR_RES_PATH = "fo|res/common.jet";  //这个路径前必须加一个|fo，否则就会语法构建不通过
+    GRAMMAR_BUILD_PATH = "res/gramBuild";
+    GRAMMAR_FILE = basePath+"/assets/grammar.bnf";//自定义语法文件
+
+    string login_parameters = "appid = 5a52e95f, work_dir = "+basePath+"/assets";
+    ret = MSPLogin(NULL, NULL, login_parameters.c_str());
+    if (MSP_SUCCESS != ret)	{
+        cout<<"MSPLogin failed , Error code  "<<ret<<endl;
+        exit(0);
+    }
+
+    memset(&asr_data, 0, sizeof(UserData));
+    cout<<"Start building offline  grammar for recognition ..."<<endl;
+    ret = build_grammar(&asr_data);  //第一次使用某语法进行识别，需要先构建语法网络，获取语法ID，之后使用此语法进行识别，无需再次构建
+    if (MSP_SUCCESS != ret) {
+        cout<<"Building grammar failed!"<<endl;
+       exit(0);
+    }
+    while (1 != asr_data.build_fini){
+        usleep(300 * 1000);
+    }
+    if (MSP_SUCCESS != asr_data.errcode){
+        exit(0);
+    }
     isChatting = false;
-    pthread_create(&record_thread_id,NULL,record_thread,(void*)session_record_begin_params);
+
+    //离线语法识别参数设置
+    snprintf(asr_params, MAX_PARAMS_LEN - 1,
+             "engine_type = local, asr_denoise=1,vad_bos=10000,vad_eos=10000,\
+             asr_res_path = %s, sample_rate = %d, \
+             grm_build_path = %s, local_grammar = %s, \
+             result_type = xml, result_encoding = UTF-8 ",
+             ASR_RES_PATH.c_str(),
+             SAMPLE_RATE_16K,
+             GRAMMAR_BUILD_PATH.c_str(),
+             asr_data.grammar_id
+             );
+    if(asr_params!=NULL){
+        pthread_create(&record_thread_id,NULL,offline_voice_recog_thread,(void*)asr_params);
+    }
     ros::spin();
     signal(SIGINT,signal_handler);
-
-     return 0;
+    return 0;
 }
 
+//离线语音识别线程
+void* offline_voice_recog_thread(void* session_begin_params){
+//    printf("sr_init param: %s",(char*)session_begin_params);
+    int errcode;
+    int i = 0;
+    struct speech_rec iat;
+    struct speech_rec_notifier recnotifier = {
+        on_result,
+        on_speech_begin,
+        on_speech_end
+    };
+    while(true){
+        //对话同步锁
+        //问候完访客时 -- 开启该线程
+        //对话60s超时或得到目标位置点  -- 挂起该线程
+        unique_lock<mutex> lock1(mutex_chat);
+        condition_chat.wait(lock1,[]{return isChatting;});
+
+        signal(SIGINT,signal_handler);
+        cout<<"\n-----------Start Chatting--------"<<endl;
+        cout<<"You can speak to me(record  for 10 seconds) : "<<endl;
+
+        errcode = sr_init(&iat, (char*)session_begin_params, SR_MIC, &recnotifier);
+        if (errcode) {
+            cout<<"Speech recognizer init failed"<<endl;
+            return NULL;
+        }
+        errcode = sr_start_listening(&iat);
+        cout<<"thread:"<<this_thread::get_id()<<endl;
+        if (errcode) {
+            cout<<"Start listen failed . code: "<< errcode<<endl;
+        }
+        //这里只睡眠4秒
+        //由于讯飞sdk的原因，底层录音三秒就会停止录音，按照官方文档中设置了参数也没有用(貌似是 底层bug)
+        //http://bbs.xfyun.cn/forum.php?mod=viewthread&tid=35056&extra=page%3D4
+       sleep(4);
+       errcode = sr_stop_listening(&iat);
+       if (errcode) {
+           cout<<"Stop listening failed  code:"<<errcode<<endl;
+       }
+       cout<<"Recording completed"<<endl;
+
+       //语音播放同步锁
+       //即将开启下一轮录音，判断当前是否在播放语音
+       //如果在播放语音，则挂起该线程，等待语音播放完
+       if(isPlayingAudio){
+           unique_lock<mutex> lock2(mutex_playing_audio);
+           condition_playing_audio.wait(lock2,[]{return !isPlayingAudio;});
+       }
+
+       sr_uninit(&iat);
+       recordCount++;
+       if(recordCount==15){
+           isChatting = false;
+           cout<<"----------- Interacting Timeout. Stop Chatting --------"<<endl;
+           std_msgs::UInt32 msg;
+           msg.data = 255;
+           next_loop_pub.publish(msg);
+           recordCount = 0;
+       }
+
+    }
+}
+
+
+//构建离线识别语法的回调函数
+int build_grm_cb(int ecode, const char *info, void *udata){
+    UserData *grm_data = (UserData *)udata;
+    if (NULL != grm_data) {
+        grm_data->build_fini = 1;
+        grm_data->errcode = ecode;
+    }
+
+    if (MSP_SUCCESS == ecode && NULL != info) {
+        cout<<"Build grammar success! Grammar ID:"<< info<<endl;
+        if (NULL != grm_data){
+        strcpy(grm_data->grammar_id,info);
+        }
+    }else{
+        cout<<"Build grammar failed!  Error code:"<< ecode<<endl;
+    }
+    return 0;
+}
+
+//构建离线识别语法
+int build_grammar(UserData *udata){
+    FILE *grm_file = NULL;
+    char *grm_content = NULL;
+    unsigned int grm_cnt_len  = 0;
+    char grm_build_params[MAX_PARAMS_LEN]  ;
+
+    grm_file = fopen(GRAMMAR_FILE.c_str(), "rb");
+    if(NULL == grm_file) {
+        cout<<"Fail to open file: "<<GRAMMAR_FILE<<" -- "<<strerror(errno)<<endl;
+        return -1;
+    }
+
+    fseek(grm_file, 0, SEEK_END);
+    grm_cnt_len = ftell(grm_file);
+    fseek(grm_file, 0, SEEK_SET);
+
+    grm_content = (char *)malloc(grm_cnt_len + 1);
+    if (NULL == grm_content)
+    {
+        cout<<"Alloc memory failed"<<endl;
+        fclose(grm_file);
+        grm_file = NULL;
+        return -1;
+    }
+    fread((void*)grm_content, 1, grm_cnt_len, grm_file);
+    grm_content[grm_cnt_len] = '\0';
+    fclose(grm_file);
+    grm_file = NULL;
+
+    snprintf(grm_build_params, MAX_PARAMS_LEN - 1,
+        "engine_type = local, \
+        asr_res_path = %s, sample_rate = %d, \
+        grm_build_path = %s, ",
+        ASR_RES_PATH.c_str(),
+        SAMPLE_RATE_16K,
+        GRAMMAR_BUILD_PATH.c_str()
+        );
+    cout<<grm_build_params<<endl;
+    ret = QISRBuildGrammar("bnf", grm_content, grm_cnt_len, grm_build_params, build_grm_cb, udata);
+
+    free(grm_content);
+    grm_content = NULL;
+
+    return ret;
+}
+
+//当Xbot到达某个目标点时，触发该函数
 void onGoalReached(const std_msgs::String& msg){
     string goal_name = msg.data;
     cout<<"onGoalReached:"<<goal_name<<endl;
@@ -108,6 +309,7 @@ void onGoalReached(const std_msgs::String& msg){
 
 }
 
+//得到人脸识别结果
 void onGetFaceResult(const xbot_msgs::FaceResult& faceResult){
 //    cout<<"onGetFaceResult  ---- tid: "<<this_thread::get_id()<<endl;
     if(!isChatting){
@@ -118,6 +320,7 @@ void onGetFaceResult(const xbot_msgs::FaceResult& faceResult){
 
 }
 
+//Talker播放完成的回调函数
 void onPlayFinished(int code,string message){
 //    cout<<"-----------------------  onPlayFinished  ---- tid: "<<this_thread::get_id()<<endl;
     //cout<<"code: "<<code<<endl;
@@ -201,6 +404,7 @@ void onPlayFinished(int code,string message){
     }
 }
 
+//在线语音识别线程
 void* record_thread(void* session_begin_params){
 //    cout<<"start record thread  "<<this_thread::get_id()<<endl;
     string login_parameters = "appid = 5a52e95f, work_dir = "+basePath+"/assets";
@@ -270,7 +474,6 @@ void* record_thread(void* session_begin_params){
 
 }
 
-
 //语音识别的结果回调
 void on_result(const char *result, char is_last){
 //    cout<<"on_result       ----  tid: "<<this_thread::get_id()<<endl;
@@ -282,7 +485,7 @@ void on_result(const char *result, char is_last){
             if (g_result)
                 g_buffersize += BUFFER_SIZE;
             else {
-                printf("mem alloc failed\n");
+                cout<<"Alloc memory failed\n"<<endl;
                 return;
             }
         }
@@ -291,8 +494,9 @@ void on_result(const char *result, char is_last){
         if(is_last){
             isPlayingAudio = true;
             recordCount = 0;
-            cout<<"Speech result : "<<g_result<<endl;
-            talker.chat(g_result,onPlayFinished);
+//            cout<<"Speech result : "<<g_result<<endl;
+            const char* result = parse_result_from_xml(g_result);
+            talker.chat(result,onPlayFinished);
         }
     }
 }
@@ -312,7 +516,8 @@ void on_speech_begin(){
 
 //语音识别结束
 void on_speech_end(int reason){
-//    cout<<"on_speech_end     ----  tid: "<<this_thread::get_id()<<endl;
+    cout<<"on_speech_end     ----  thread id: "<<this_thread::get_id()<<endl;
+    cout<<"on_speech_end :"<<reason<<endl;
     if (reason == END_REASON_VAD_DETECT){
         cout<<"Speaking done.  ";
     }
@@ -321,6 +526,43 @@ void on_speech_end(int reason){
         cout<<"Request Timeout"<<endl;
     }
 
+}
+
+//离线语音识别时，从返回结果的xml中解析出语音识别结果
+const char* parse_result_from_xml(char*  xmlContent){
+    XMLDocument doc ;
+    XMLError err = doc.Parse(xmlContent,strlen(xmlContent));
+    string empty = "";
+    if(err!=XML_SUCCESS){
+        cout<<"Fail to  parse XML "<<endl;
+        return empty.c_str();
+    }
+    XMLElement *pRoot = doc.RootElement();
+    XMLElement* eleConfidence = pRoot->FirstChildElement("confidence");
+    int valueConfidence;
+    err = eleConfidence->QueryIntText(&valueConfidence);
+    if(err!=XML_SUCCESS){
+        cout<<"Fail to  parse confidence from XML "<<endl;
+        return empty.c_str();
+    }
+    //如果置信度confidence小于50，则认为未识别出有效的语法条目
+    if(valueConfidence<=50){
+        return empty.c_str();
+    }
+    XMLElement* eleObject = pRoot->FirstChildElement("result")->FirstChildElement("object");
+    XMLElement* eleContent = eleObject->FirstChildElement("content");
+    int contentid;
+    err = eleContent->QueryIntAttribute("id",&contentid);
+    if(err!=XML_SUCCESS){
+        cout<<"Fail to  parse object id from XML "<<endl;
+        return empty.c_str();
+    }
+//    cout <<"id:"<<contentid<<endl;
+
+    const char* result;
+    result = eleContent->GetText();
+    cout<<"result:"<<result<<"   confidence:"<<valueConfidence<<endl;
+    return result;
 }
 
 void signal_handler(int s){
