@@ -8,7 +8,7 @@
 
 
 	<!-- Load the URDF/Xacro model of our robot -->
-	<arg name="urdf_file" default="$(find xacro)/xacro.py '$(find xbot2_description)/urdf/robot.xacro'" />
+	<arg name="urdf_file" default="$(find xacro)/xacro.py '$(find xbot_description)/urdf/robot.xacro'" />
 	<param name="robot_description" command="$(arg urdf_file)" />
 
 	<!-- state publisher -->
@@ -29,6 +29,6 @@
 	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 
 	<!-- camera pusher -->
-	<node name="camera_pusher" pkg="xbot2_tools" type="camera_pusher" />
+	<node name="camera_pusher" pkg="xbot_tools" type="camera_pusher" />
 
 </launch>

@@ -1,1 +1,0 @@
-/home/lee/catkin_ws/src/xbot2/talker/build-src-Desktop_Qt_5_7_1_GCC_64bit-Default/CMakeFiles/talker.dir

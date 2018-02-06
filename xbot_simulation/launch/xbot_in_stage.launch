@@ -40,7 +40,7 @@
 	</node>
 
 	<!--  ***************** Robot Model *****************  -->
-	<param name="robot_description" command="$(find xacro)/xacro.py --inorder $(find xbot2_description)/urdf/robot.xacro" />
+	<param name="robot_description" command="$(find xacro)/xacro.py --inorder $(find xbot_description)/urdf/robot.xacro" />
 	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
 		<param name="publish_frequency" type="double" value="5.0" />
 	</node>
